@@ -123,11 +123,18 @@ export function ShareMenu({ dataSourceId, shareData, cardTitle }: ShareMenuProps
     setIsGenerating(true);
     
     try {
-      // This would integrate with html2canvas or similar for actual export
-      // For now, we'll show a placeholder toast
+      const { exportCard } = await import('@/utils/exportUtils');
+      const elementId = dataSourceId || 'main-content';
+      
+      await exportCard(elementId, {
+        format,
+        filename: `buxtax-${cardTitle.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+        addWatermark: true,
+      });
+      
       toast({
-        title: `${format.toUpperCase()} Export`,
-        description: "Export feature coming soon!",
+        title: `${format.toUpperCase()} exported!`,
+        description: "File has been downloaded successfully",
       });
     } catch (error) {
       toast({
