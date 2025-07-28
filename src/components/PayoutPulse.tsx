@@ -289,29 +289,14 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
         variant="detailed"
         size="lg"
       >
-        <EmptyState
-          icon={Upload}
-          title="Upload Your Payout Data"
-          description="Upload your Roblox payout data (CSV, XLS, or XLSX) to analyze your earning trends and calculate precise profit margins."
-          action={{
-            label: "Choose File",
-            onClick: () => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()
-          }}
-        >
-          <div className="mt-4">
-            <FileUpload
-              onFileSelect={handleFileUpload}
-              accept=".csv"
-              maxSize={10}
-              className="max-w-md mx-auto"
-            />
-            <div className="mt-6 space-y-2">
-              <p className="text-xs text-muted-foreground">
-                File processed locally - your data never leaves your device
-              </p>
-            </div>
-          </div>
-        </EmptyState>
+        <div className="p-6">
+          <FileUpload
+            onFileSelect={handleFileUpload}
+            accept=".csv"
+            maxSize={10}
+            className="max-w-2xl mx-auto"
+          />
+        </div>
       </BuxCard>
     );
   }
