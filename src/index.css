@@ -127,3 +127,36 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Mobile-first responsive utilities */
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  .mobile-text-input {
+    @apply text-base; /* Prevents zoom on iOS */
+  }
+
+  .mobile-card-padding {
+    @apply p-4 sm:p-6;
+  }
+
+  .mobile-grid {
+    @apply grid-cols-1 sm:grid-cols-2;
+  }
+
+  .mobile-flex-col {
+    @apply flex-col sm:flex-row;
+  }
+
+  /* Loading states */
+  .loading-shimmer {
+    @apply animate-pulse bg-muted/50 rounded;
+  }
+
+  /* Focus states for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+}

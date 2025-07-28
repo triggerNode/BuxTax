@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { BuxCard } from "@/components/shared/BuxCard";
 import { calculateRequiredRobux, formatCurrency, formatRobux } from "@/lib/fees";
 import { FormulaTooltip } from "@/components/shared/FormulaTooltip";
+import { useDebounce } from "@/hooks/useDebounce";
+import { analytics } from "@/utils/analytics";
 
 interface GoalSeekerProps {
   userType: 'gameDev' | 'ugcCreator';
@@ -16,16 +18,32 @@ export function GoalSeeker({ userType }: GoalSeekerProps) {
   const [expectedAdSpend, setExpectedAdSpend] = useState("0");
   const [expectedOtherCosts, setExpectedOtherCosts] = useState("0");
 
+  // Debounce inputs for better performance
+  const debouncedTargetPayout = useDebounce(parseFloat(targetPayout) || 0, 300);
+  const debouncedExpectedAdSpend = useDebounce(parseFloat(expectedAdSpend) || 0, 300);
+  const debouncedExpectedOtherCosts = useDebounce(parseFloat(expectedOtherCosts) || 0, 300);
+
   // Live calculation of required Robux
   const requiredRobux = useMemo(() => {
-    const target = parseFloat(targetPayout) || 0;
-    if (target <= 0) return 0;
+    if (debouncedTargetPayout <= 0) return 0;
 
-    return calculateRequiredRobux(target, userType, {
-      adSpend: parseFloat(expectedAdSpend) || 0,
-      otherCosts: parseFloat(expectedOtherCosts) || 0,
+    const result = calculateRequiredRobux(debouncedTargetPayout, userType, {
+      adSpend: debouncedExpectedAdSpend,
+      otherCosts: debouncedExpectedOtherCosts,
     });
-  }, [targetPayout, userType, expectedAdSpend, expectedOtherCosts]);
+
+    // Track goal setting
+    if (debouncedTargetPayout > 0) {
+      analytics.track('goal_calculated', {
+        userType,
+        targetUSD: debouncedTargetPayout,
+        requiredRobux: result,
+        deadline: deadline || null,
+      });
+    }
+
+    return result;
+  }, [debouncedTargetPayout, userType, debouncedExpectedAdSpend, debouncedExpectedOtherCosts, deadline]);
 
   const shareData = {
     nextGoal: parseFloat(targetPayout) || 0,

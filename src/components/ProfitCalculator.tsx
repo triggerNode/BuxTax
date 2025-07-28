@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calculator, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,8 +7,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BuxCard } from "@/components/shared/BuxCard";
 import { useLiveCalculation } from "@/hooks/useLiveCalculation";
+import { useDebounce } from "@/hooks/useDebounce";
 import { formatCurrency, formatRobux, formatPercentage } from "@/lib/fees";
 import { FormulaTooltip } from "@/components/shared/FormulaTooltip";
+import { analytics } from "@/utils/analytics";
 
 interface ProfitCalculatorProps {
   userType: 'gameDev' | 'ugcCreator';
@@ -23,18 +25,35 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
   const [otherCosts, setOtherCosts] = useState("0");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
+  // Debounce inputs for better performance
+  const debouncedGrossRobux = useDebounce(parseFloat(grossRobux) || 0, 300);
+  const debouncedAdSpend = useDebounce(parseFloat(adSpend) || 0, 300);
+  const debouncedOtherCosts = useDebounce(parseFloat(otherCosts) || 0, 300);
+
   // Live calculation using custom hook
   const results = useLiveCalculation(
-    parseFloat(grossRobux) || 0,
+    debouncedGrossRobux,
     userType,
     {
-      adSpend: parseFloat(adSpend) || 0,
+      adSpend: debouncedAdSpend,
       groupSplits: parseFloat(groupSplits) || 0,
       affiliatePayouts: parseFloat(affiliatePayouts) || 0,
       refunds: parseFloat(refunds) || 0,
-      otherCosts: parseFloat(otherCosts) || 0,
+      otherCosts: debouncedOtherCosts,
     }
   );
+
+  // Track significant calculations
+  useEffect(() => {
+    if (debouncedGrossRobux > 0) {
+      analytics.track('calculation_performed', {
+        userType,
+        grossRobux: debouncedGrossRobux,
+        usdPayout: results.usdPayout,
+        effectiveTakeRate: results.effectiveTakeRate,
+      });
+    }
+  }, [debouncedGrossRobux, results.usdPayout, userType]);
 
   const shareData = {
     netEarnings: results.usdPayout,
@@ -49,7 +68,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
       dataSourceId="profit-calc"
     >
       {/* Primary Metrics */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid mobile-grid gap-4 mb-6">
         <div className="text-center p-4 bg-primary/5 rounded-lg">
           <div className="text-2xl font-bold text-primary">{formatCurrency(results.usdPayout)}</div>
           <div className="flex items-center justify-center gap-2">
@@ -107,12 +126,12 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
           placeholder="10000"
           value={grossRobux}
           onChange={(e) => setGrossRobux(e.target.value)}
-          className="text-center text-lg font-semibold"
+          className="text-center text-lg font-semibold mobile-text-input mobile-touch-target focus-ring"
         />
       </div>
 
       {/* Quick Costs */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="grid mobile-grid gap-3 mb-4">
         <div>
           <Label className="text-sm">Ad Spend</Label>
           <Input
@@ -136,7 +155,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
       {/* Advanced Costs Accordion */}
       <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
         <CollapsibleTrigger asChild>
-          <Button variant="ghost" className="w-full justify-between p-2 h-auto">
+          <Button variant="ghost" className="w-full justify-between p-2 h-auto mobile-touch-target focus-ring">
             <span className="text-sm">Advanced Costs</span>
             {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>

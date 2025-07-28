@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BuxTaxHeader } from "@/components/BuxTaxHeader";
 import { TabNavigation } from "@/components/TabNavigation";
 import { ProfitCalculator } from "@/components/ProfitCalculator";
 import { GoalSeeker } from "@/components/GoalSeeker";
 import { PayoutPulse } from "@/components/PayoutPulse";
+import { useLocalStorage, useUrlState } from "@/hooks/useLocalStorage";
+import { analytics } from "@/utils/analytics";
 
 const Index = () => {
-  const [userType, setUserType] = useState<'gameDev' | 'ugcCreator'>('gameDev');
-  const [activeTab, setActiveTab] = useState<'profit' | 'goal' | 'pulse'>('profit');
+  const [userType, setUserType] = useLocalStorage<'gameDev' | 'ugcCreator'>('buxtax-user-type', 'gameDev');
+  const [activeTab, setActiveTab] = useUrlState<'profit' | 'goal' | 'pulse'>('tab', 'profit');
+
+  // Track page views and user interactions
+  useEffect(() => {
+    analytics.track('page_loaded', { userType, activeTab });
+  }, []);
+
+  const handleUserTypeChange = (newUserType: 'gameDev' | 'ugcCreator') => {
+    setUserType(newUserType);
+    analytics.track('user_type_changed', { from: userType, to: newUserType });
+  };
+
+  const handleTabChange = (newTab: 'profit' | 'goal' | 'pulse') => {
+    setActiveTab(newTab);
+    analytics.track('tab_changed', { from: activeTab, to: newTab, userType });
+  };
 
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -27,12 +44,12 @@ const Index = () => {
       <div className="max-w-4xl mx-auto">
         <BuxTaxHeader 
           userType={userType} 
-          onUserTypeChange={setUserType}
+          onUserTypeChange={handleUserTypeChange}
         />
         
         <TabNavigation 
           activeTab={activeTab} 
-          onTabChange={setActiveTab}
+          onTabChange={handleTabChange}
         />
         
         <div className="flex justify-center">

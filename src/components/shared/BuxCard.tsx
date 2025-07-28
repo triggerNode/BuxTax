@@ -33,9 +33,9 @@ export function BuxCard({
   return (
     <Card 
       id={cardId}
-      className="w-full max-w-md mx-auto bg-card border-border shadow-lg"
+      className="w-full max-w-md mx-auto bg-card border-border shadow-lg mobile-card-padding"
     >
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-4 mobile-card-padding">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -61,7 +61,7 @@ export function BuxCard({
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 mobile-card-padding pt-0">
         {children}
         
         {/* Footer with timestamp */}
