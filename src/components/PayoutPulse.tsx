@@ -94,9 +94,10 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
           variant: "destructive",
         });
       } else {
+        const formatType = (mapping.description && mapping.amount) ? 'transaction' : 'summary';
         toast({
           title: "CSV uploaded successfully",
-          description: `Processed ${result.data.length} rows of payout data.`,
+          description: `Processed ${result.data.length} ${formatType} rows of payout data.`,
         });
       }
       
@@ -137,6 +138,9 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       affiliatePayouts: /^(affiliate|referral).*(payout|payment)/i,
       refunds: /^(refund|chargeback|return)/i,
       otherCosts: /^(other|misc|additional).*(cost|expense|fee)/i,
+      // Transaction format patterns
+      description: /^(description|type|category|transaction)/i,
+      amount: /^(amount|value|sum|total)$/i,
     };
 
     Object.keys(sampleRow).forEach(header => {

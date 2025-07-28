@@ -5,6 +5,12 @@ export interface RawPayoutRow {
   [key: string]: string;
 }
 
+export interface TransactionRow {
+  date: string;
+  description: string;
+  amount: number;
+}
+
 export interface ParsedPayoutData {
   date: string;
   grossRobux: number;
@@ -41,11 +47,36 @@ export interface ColumnMapping {
   affiliatePayouts?: string;
   refunds?: string;
   otherCosts?: string;
+  // Transaction format specific
+  description?: string;
+  amount?: string;
+}
+
+export interface TransactionTypeMapping {
+  [description: string]: 'sale' | 'marketplaceFee' | 'adSpend' | 'groupSplit' | 'affiliateFee' | 'refund' | 'otherCost';
+}
+
+export const DEFAULT_TRANSACTION_MAPPINGS: TransactionTypeMapping = {
+  'sale': 'sale',
+  'marketplace fee': 'marketplaceFee',
+  'ad spend': 'adSpend',
+  'advertising': 'adSpend',
+  'group split': 'groupSplit',
+  'affiliate fee': 'affiliateFee',
+  'affiliate payout': 'affiliateFee',
+  'refund': 'refund',
+  'chargeback': 'refund',
+  'other': 'otherCost',
+  'misc': 'otherCost',
 }
 
 const DEVEX_RATE = 0.0035; // $0.0035 per Robux
 
-export function parseCSV(csvContent: string, columnMapping?: ColumnMapping): Promise<CSVParseResult> {
+export function parseCSV(
+  csvContent: string, 
+  columnMapping?: ColumnMapping,
+  transactionMapping?: TransactionTypeMapping
+): Promise<CSVParseResult> {
   return new Promise((resolve) => {
     Papa.parse(csvContent, {
       header: true,
@@ -53,7 +84,7 @@ export function parseCSV(csvContent: string, columnMapping?: ColumnMapping): Pro
       transformHeader: (header) => header.trim(),
       complete: (results) => {
         const errors: string[] = [];
-        const parsedData: ParsedPayoutData[] = [];
+        let parsedData: ParsedPayoutData[] = [];
         
         if (results.errors.length > 0) {
           results.errors.forEach(error => {
@@ -64,16 +95,26 @@ export function parseCSV(csvContent: string, columnMapping?: ColumnMapping): Pro
         // Auto-detect columns if no mapping provided
         const mapping = columnMapping || detectColumns(results.data[0] as RawPayoutRow);
         
-        results.data.forEach((row: any, index: number) => {
-          try {
-            const parsed = parseRow(row, mapping, index + 1);
-            if (parsed) {
-              parsedData.push(parsed);
+        // Detect format type
+        const isTransactionFormat = detectTransactionFormat(mapping);
+        
+        if (isTransactionFormat) {
+          // Parse as transaction format
+          const transactions = parseTransactions(results.data, mapping, transactionMapping);
+          parsedData = aggregateTransactions(transactions);
+        } else {
+          // Parse as summary format (existing logic)
+          results.data.forEach((row: any, index: number) => {
+            try {
+              const parsed = parseRow(row, mapping, index + 1);
+              if (parsed) {
+                parsedData.push(parsed);
+              }
+            } catch (error) {
+              errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Parse error'}`);
             }
-          } catch (error) {
-            errors.push(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Parse error'}`);
-          }
-        });
+          });
+        }
 
         // Sort by date
         parsedData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -108,6 +149,9 @@ function detectColumns(sampleRow: RawPayoutRow): ColumnMapping {
     affiliatePayouts: /^(affiliate|referral).*(payout|payment)/i,
     refunds: /^(refund|chargeback|return)/i,
     otherCosts: /^(other|misc|additional).*(cost|expense|fee)/i,
+    // Transaction format patterns
+    description: /^(description|type|category|transaction)/i,
+    amount: /^(amount|value|sum|total)$/i,
   };
 
   Object.keys(sampleRow).forEach(header => {
@@ -122,6 +166,126 @@ function detectColumns(sampleRow: RawPayoutRow): ColumnMapping {
   });
 
   return mapping;
+}
+
+function detectTransactionFormat(mapping: ColumnMapping): boolean {
+  // Transaction format requires date, description, and amount columns
+  return !!(mapping.date && mapping.description && mapping.amount);
+}
+
+function parseTransactions(
+  data: any[], 
+  mapping: ColumnMapping, 
+  transactionMapping: TransactionTypeMapping = DEFAULT_TRANSACTION_MAPPINGS
+): TransactionRow[] {
+  const transactions: TransactionRow[] = [];
+  
+  data.forEach((row: any, index: number) => {
+    try {
+      const dateStr = row[mapping.date || ''];
+      const description = row[mapping.description || ''];
+      const amountStr = row[mapping.amount || ''];
+      
+      if (!dateStr || !description || !amountStr) {
+        return; // Skip invalid rows
+      }
+      
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        throw new Error(`Invalid date: ${dateStr}`);
+      }
+      
+      const amount = parseFloat(amountStr.replace(/[$,\s]/g, ''));
+      if (isNaN(amount)) {
+        throw new Error(`Invalid amount: ${amountStr}`);
+      }
+      
+      transactions.push({
+        date: date.toISOString().split('T')[0],
+        description: description.trim(),
+        amount,
+      });
+    } catch (error) {
+      console.warn(`Row ${index + 1}: ${error instanceof Error ? error.message : 'Parse error'}`);
+    }
+  });
+  
+  return transactions;
+}
+
+function aggregateTransactions(transactions: TransactionRow[]): ParsedPayoutData[] {
+  const dailyData = new Map<string, ParsedPayoutData>();
+  
+  transactions.forEach(transaction => {
+    if (!dailyData.has(transaction.date)) {
+      dailyData.set(transaction.date, {
+        date: transaction.date,
+        grossRobux: 0,
+        netRobux: 0,
+        marketplaceFee: 0,
+        adSpend: 0,
+        groupSplits: 0,
+        affiliatePayouts: 0,
+        refunds: 0,
+        otherCosts: 0,
+        usdValue: 0,
+      });
+    }
+    
+    const dayData = dailyData.get(transaction.date)!;
+    const transactionType = categorizeTransaction(transaction.description);
+    
+    switch (transactionType) {
+      case 'sale':
+        dayData.grossRobux += Math.max(0, transaction.amount);
+        break;
+      case 'marketplaceFee':
+        dayData.marketplaceFee += Math.abs(transaction.amount);
+        break;
+      case 'adSpend':
+        dayData.adSpend += Math.abs(transaction.amount);
+        break;
+      case 'groupSplit':
+        dayData.groupSplits += Math.abs(transaction.amount);
+        break;
+      case 'affiliateFee':
+        dayData.affiliatePayouts += Math.abs(transaction.amount);
+        break;
+      case 'refund':
+        dayData.refunds += Math.abs(transaction.amount);
+        break;
+      case 'otherCost':
+        dayData.otherCosts += Math.abs(transaction.amount);
+        break;
+    }
+  });
+  
+  // Calculate net Robux and USD value for each day
+  return Array.from(dailyData.values()).map(dayData => {
+    dayData.netRobux = dayData.grossRobux - dayData.marketplaceFee - dayData.adSpend - 
+                      dayData.groupSplits - dayData.affiliatePayouts - dayData.refunds - dayData.otherCosts;
+    dayData.usdValue = dayData.netRobux * DEVEX_RATE;
+    return dayData;
+  });
+}
+
+function categorizeTransaction(description: string): keyof TransactionTypeMapping {
+  const lowerDesc = description.toLowerCase().trim();
+  
+  // Check for exact matches first
+  if (DEFAULT_TRANSACTION_MAPPINGS[lowerDesc]) {
+    return DEFAULT_TRANSACTION_MAPPINGS[lowerDesc];
+  }
+  
+  // Check for partial matches
+  for (const [key, category] of Object.entries(DEFAULT_TRANSACTION_MAPPINGS)) {
+    if (lowerDesc.includes(key)) {
+      return category;
+    }
+  }
+  
+  // Default to sale if positive, other cost if negative
+  return 'sale';
 }
 
 function parseRow(row: RawPayoutRow, mapping: ColumnMapping, rowNumber: number): ParsedPayoutData | null {

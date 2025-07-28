@@ -14,23 +14,32 @@ interface CSVColumnMapperProps {
 }
 
 const REQUIRED_FIELDS = {
-  date: { label: "Date", required: true, description: "Transaction date" },
-  grossRobux: { label: "Gross Robux", required: true, description: "Total Robux earned before fees" },
-} as const;
+  date: { label: 'Date', required: true, description: 'Transaction or payout date' },
+};
 
-const OPTIONAL_FIELDS = {
-  netRobux: { label: "Net Robux", required: false, description: "Final Robux after all deductions" },
-  marketplaceFee: { label: "Marketplace Fee", required: false, description: "Platform commission" },
-  adSpend: { label: "Ad Spend", required: false, description: "Advertising costs" },
-  groupSplits: { label: "Group Splits", required: false, description: "Revenue sharing payouts" },
-  affiliatePayouts: { label: "Affiliate Payouts", required: false, description: "Referral commissions" },
-  refunds: { label: "Refunds", required: false, description: "Customer refunds" },
-  otherCosts: { label: "Other Costs", required: false, description: "Additional expenses" },
-} as const;
+const SUMMARY_FIELDS = {
+  grossRobux: { label: 'Gross Robux', required: true, description: 'Total Robux earned before deductions' },
+  netRobux: { label: 'Net Robux', required: false, description: 'Final Robux after all deductions' },
+  marketplaceFee: { label: 'Marketplace Fee', required: false, description: 'Platform commission (30%)' },
+  adSpend: { label: 'Ad Spend', required: false, description: 'Advertising costs' },
+  groupSplits: { label: 'Group Splits', required: false, description: 'Revenue sharing with group members' },
+  affiliatePayouts: { label: 'Affiliate Payouts', required: false, description: 'Referral commissions' },
+  refunds: { label: 'Refunds', required: false, description: 'Refunded transactions' },
+  otherCosts: { label: 'Other Costs', required: false, description: 'Additional deductions' },
+};
+
+const TRANSACTION_FIELDS = {
+  description: { label: 'Description/Type', required: true, description: 'Transaction description or type' },
+  amount: { label: 'Amount', required: true, description: 'Transaction amount (positive or negative)' },
+};
 
 export function CSVColumnMapper({ csvHeaders, suggestedMapping, onMappingConfirm, onCancel }: CSVColumnMapperProps) {
   const [mapping, setMapping] = useState<ColumnMapping>(suggestedMapping);
   const [errors, setErrors] = useState<string[]>([]);
+  
+  // Detect format type based on suggested mapping
+  const isTransactionFormat = !!(mapping.description && mapping.amount);
+  const formatType = isTransactionFormat ? 'Transaction' : 'Summary';
 
   const updateMapping = (field: string, header: string | undefined) => {
     setMapping(prev => ({
@@ -39,25 +48,57 @@ export function CSVColumnMapper({ csvHeaders, suggestedMapping, onMappingConfirm
     }));
   };
 
-  const validateMapping = () => {
+  const validateMapping = (): boolean => {
     const newErrors: string[] = [];
-    
-    // Check required fields
+    const usedHeaders = new Set<string>();
+
+    // Check required fields (always need date)
     Object.entries(REQUIRED_FIELDS).forEach(([field, config]) => {
-      if (!mapping[field as keyof ColumnMapping]) {
+      const mappedHeader = mapping[field as keyof ColumnMapping];
+      if (!mappedHeader) {
         newErrors.push(`${config.label} is required`);
+      } else if (usedHeaders.has(mappedHeader)) {
+        newErrors.push(`${mappedHeader} is mapped to multiple fields`);
+      } else {
+        usedHeaders.add(mappedHeader);
       }
     });
 
-    // Check for duplicate mappings
-    const usedHeaders = Object.values(mapping).filter(Boolean);
-    const duplicates = usedHeaders.filter((header, index) => 
-      usedHeaders.indexOf(header) !== index
-    );
-    
-    if (duplicates.length > 0) {
-      newErrors.push(`Duplicate column mappings: ${duplicates.join(", ")}`);
+    // Check format-specific required fields
+    if (isTransactionFormat) {
+      Object.entries(TRANSACTION_FIELDS).forEach(([field, config]) => {
+        const mappedHeader = mapping[field as keyof ColumnMapping];
+        if (!mappedHeader) {
+          newErrors.push(`${config.label} is required for transaction format`);
+        } else if (usedHeaders.has(mappedHeader)) {
+          newErrors.push(`${mappedHeader} is mapped to multiple fields`);
+        } else {
+          usedHeaders.add(mappedHeader);
+        }
+      });
+    } else {
+      // Summary format requires at least gross Robux
+      const grossRobux = mapping.grossRobux;
+      if (!grossRobux) {
+        newErrors.push('Gross Robux is required for summary format');
+      } else if (usedHeaders.has(grossRobux)) {
+        newErrors.push(`${grossRobux} is mapped to multiple fields`);
+      } else {
+        usedHeaders.add(grossRobux);
+      }
     }
+
+    // Check for duplicate mappings in optional fields
+    Object.keys(SUMMARY_FIELDS).forEach(field => {
+      const mappedHeader = mapping[field as keyof ColumnMapping];
+      if (mappedHeader && field !== 'grossRobux') { // grossRobux already checked above
+        if (usedHeaders.has(mappedHeader)) {
+          newErrors.push(`${mappedHeader} is mapped to multiple fields`);
+        } else {
+          usedHeaders.add(mappedHeader);
+        }
+      }
+    });
 
     setErrors(newErrors);
     return newErrors.length === 0;
@@ -121,7 +162,8 @@ export function CSVColumnMapper({ csvHeaders, suggestedMapping, onMappingConfirm
           <Badge variant="outline">{csvHeaders.length} columns detected</Badge>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Match your CSV columns to the expected data fields. Required fields must be mapped.
+          Detected format: <span className="font-medium">{formatType}</span>. 
+          Match your CSV columns to the expected data fields.
         </p>
       </CardHeader>
       
@@ -147,18 +189,27 @@ export function CSVColumnMapper({ csvHeaders, suggestedMapping, onMappingConfirm
           {Object.entries(REQUIRED_FIELDS).map(([field, config]) =>
             renderFieldRow(field, config, true)
           )}
+          {isTransactionFormat && 
+            Object.entries(TRANSACTION_FIELDS).map(([field, config]) =>
+              renderFieldRow(field, config, true)
+            )
+          }
+          {!isTransactionFormat && 
+            renderFieldRow('grossRobux', SUMMARY_FIELDS.grossRobux, true)
+          }
         </div>
 
-        {/* Optional Fields */}
-        <div className="space-y-3">
-          <h3 className="font-semibold">Optional Fields</h3>
-          <p className="text-xs text-muted-foreground">
-            These fields will be calculated automatically if not provided
-          </p>
-          {Object.entries(OPTIONAL_FIELDS).map(([field, config]) =>
-            renderFieldRow(field, config, false)
-          )}
-        </div>
+        {!isTransactionFormat && (
+          <div className="space-y-3">
+            <h3 className="font-semibold">Optional Fields</h3>
+            <p className="text-xs text-muted-foreground">
+              These fields will be calculated automatically if not provided
+            </p>
+            {Object.entries(SUMMARY_FIELDS).filter(([field]) => field !== 'grossRobux').map(([field, config]) =>
+              renderFieldRow(field, config, false)
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t">
