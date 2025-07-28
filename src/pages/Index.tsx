@@ -47,8 +47,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className={`min-h-screen bg-gradient-to-br from-background to-muted/20 py-8 ${userType === 'gameDev' ? 'theme-gamedev' : 'theme-ugc'}`}>
+      <div className="dashboard-container">
         <BuxTaxHeader 
           userType={userType} 
           onUserTypeChange={handleUserTypeChange}
@@ -59,8 +59,10 @@ const Index = () => {
           onTabChange={handleTabChange}
         />
         
-        <div className="flex justify-center">
-          {renderActiveTab()}
+        <div className="dashboard-grid">
+          <div className="lg:col-span-12">
+            {renderActiveTab()}
+          </div>
         </div>
       </div>
     </div>

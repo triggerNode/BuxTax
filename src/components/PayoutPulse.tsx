@@ -284,6 +284,8 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       <BuxCard 
         title="Payout Pulse" 
         icon={TrendingUp}
+        variant="detailed"
+        size="lg"
       >
         <div className="text-center py-12">
           <FileUpload
@@ -311,33 +313,48 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <BuxCard title="Total Earnings" icon={TrendingUp} variant="summary">
-          <div className="text-3xl font-bold">
-            {viewMode === "robux" ? formatRobux(totalEarnings) : formatCurrency(totalEarnings)}
+      {/* Summary Cards Dashboard */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <BuxCard title="Total Earnings" icon={TrendingUp} variant="dashboard" size="sm">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-primary mb-2">
+              {viewMode === "robux" ? formatRobux(totalEarnings) : formatCurrency(totalEarnings)}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {dateRange === "all" ? "All time" : `Last ${dateRange}`}
+            </p>
+            <div className="mt-3 text-xs text-primary/80 bg-primary/10 rounded-full px-3 py-1 inline-block">
+              Total Revenue
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            {dateRange === "all" ? "All time" : `Last ${dateRange}`}
-          </p>
         </BuxCard>
 
-        <BuxCard title="Effective Take Rate" icon={Calendar} variant="summary">
-          <div className="text-3xl font-bold text-destructive">
-            {effectiveTakeRate.toFixed(1)}%
+        <BuxCard title="Effective Take Rate" icon={Calendar} variant="dashboard" size="sm">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-destructive mb-2">
+              {effectiveTakeRate.toFixed(1)}%
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Platform + costs
+            </p>
+            <div className="mt-3 text-xs text-destructive/80 bg-destructive/10 rounded-full px-3 py-1 inline-block">
+              Cost Rate
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Platform + costs
-          </p>
         </BuxCard>
 
-        <BuxCard title="Data Points" icon={Upload} variant="summary">
-          <div className="text-3xl font-bold">
-            {getFilteredData().length}
+        <BuxCard title="Data Points" icon={Upload} variant="dashboard" size="sm">
+          <div className="text-center">
+            <div className="text-3xl font-bold mb-2">
+              {getFilteredData().length}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Payout records
+            </p>
+            <div className="mt-3 text-xs text-muted-foreground bg-muted/50 rounded-full px-3 py-1 inline-block">
+              Data Records
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Payout records
-          </p>
         </BuxCard>
       </div>
 
@@ -375,44 +392,50 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       <BuxCard 
         title="Earnings Over Time" 
         icon={TrendingUp}
+        variant="chart"
+        size="xl"
         shareable
         shareData={{
           netEarnings: totalEarnings,
           effectiveTakeRate: effectiveTakeRate,
         }}
       >
-        <div className="h-80">
+        <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
+            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
                 dataKey="date" 
                 tick={{ fontSize: 12 }}
                 tickLine={{ strokeOpacity: 0.3 }}
+                axisLine={{ strokeOpacity: 0.3 }}
               />
               <YAxis 
                 tick={{ fontSize: 12 }}
                 tickLine={{ strokeOpacity: 0.3 }}
+                axisLine={{ strokeOpacity: 0.3 }}
                 tickFormatter={(value) => viewMode === "robux" ? `${(value / 1000).toFixed(0)}k` : `$${value.toFixed(0)}`}
               />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'hsl(var(--background))',
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 }}
                 formatter={(value: number) => [
                   viewMode === "robux" ? formatRobux(value) : formatCurrency(value),
                   viewMode === "robux" ? "Net Robux" : "Net USD"
                 ]}
+                labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
               <Line 
                 type="monotone" 
                 dataKey={viewMode === "robux" ? "netRobux" : "netUSD"}
                 stroke="hsl(var(--primary))" 
-                strokeWidth={2}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, strokeWidth: 0 }}
+                strokeWidth={3}
+                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 5 }}
+                activeDot={{ r: 7, strokeWidth: 0, fill: 'hsl(var(--primary-glow))' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -423,38 +446,42 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       <BuxCard 
         title="Fee Breakdown" 
         icon={Filter}
+        variant="detailed"
+        size="lg"
         shareable
         shareData={{
           netEarnings: totalEarnings,
           effectiveTakeRate: effectiveTakeRate,
         }}
       >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Robux</TableHead>
-              <TableHead className="text-right">USD</TableHead>
-              <TableHead className="text-right">% of Gross</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {feeBreakdown.map((fee, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{fee.category}</TableCell>
-                <TableCell className="text-right text-destructive">
-                  -{formatRobux(fee.totalRobux)}
-                </TableCell>
-                <TableCell className="text-right text-destructive">
-                  -{formatCurrency(fee.totalUSD)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {fee.percentage.toFixed(1)}%
-                </TableCell>
+        <div className="table-responsive">
+          <Table className="table-comfortable">
+            <TableHeader>
+              <TableRow className="border-b border-border">
+                <TableHead className="font-semibold">Category</TableHead>
+                <TableHead className="text-right font-semibold">Robux</TableHead>
+                <TableHead className="text-right font-semibold">USD</TableHead>
+                <TableHead className="text-right font-semibold">% of Gross</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {feeBreakdown.map((fee, index) => (
+                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+                  <TableCell className="font-medium py-3">{fee.category}</TableCell>
+                  <TableCell className="text-right text-destructive font-mono py-3">
+                    -{formatRobux(fee.totalRobux)}
+                  </TableCell>
+                  <TableCell className="text-right text-destructive font-mono py-3">
+                    -{formatCurrency(fee.totalUSD)}
+                  </TableCell>
+                  <TableCell className="text-right font-semibold py-3">
+                    {fee.percentage.toFixed(1)}%
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </BuxCard>
     </div>
   );

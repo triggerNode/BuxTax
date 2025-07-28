@@ -13,22 +13,22 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   ];
 
   return (
-    <div className="flex justify-center mb-8">
-      <div className="flex bg-muted rounded-lg p-1">
+    <div className="flex justify-center mb-12">
+      <div className="flex bg-muted/50 backdrop-blur-sm rounded-xl p-2 border border-border/50 shadow-lg">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
             variant={activeTab === tab.id ? 'default' : 'ghost'}
             onClick={() => onTabChange(tab.id)}
-            className={`relative px-6 py-2 ${
+            className={`relative px-8 py-3 font-medium transition-all duration-200 ${
               activeTab === tab.id 
-                ? 'bg-background shadow-sm' 
-                : 'hover:bg-background/50'
+                ? 'bg-background shadow-md text-primary border border-primary/20' 
+                : 'hover:bg-background/60 text-muted-foreground hover:text-foreground'
             }`}
           >
             {tab.label}
             {activeTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+              <div className="absolute bottom-0 left-2 right-2 h-0.5 bg-gradient-to-r from-primary/50 via-primary to-primary/50 rounded-full" />
             )}
           </Button>
         ))}

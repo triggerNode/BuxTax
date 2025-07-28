@@ -62,17 +62,20 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
 
   return (
     <BuxCard 
-      title={`${userType === 'gameDev' ? 'Game Dev' : 'UGC Creator'} Profit Calculator`}
+      title="Profit Calculator"
       icon={Calculator}
+      variant="detailed"
+      size="lg"
+      userType={userType}
       shareData={shareData}
       dataSourceId="profit-calc"
     >
-      {/* Primary Metrics */}
-      <div className="grid mobile-grid gap-4 mb-6">
-        <div className="text-center p-4 bg-primary/5 rounded-lg">
-          <div className="text-2xl font-bold text-primary">{formatCurrency(results.usdPayout)}</div>
+      {/* Primary Metrics Dashboard */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+          <div className="text-3xl font-bold text-primary mb-2">{formatCurrency(results.usdPayout)}</div>
           <div className="flex items-center justify-center gap-2">
-            <div className="text-sm text-muted-foreground">USD Payout</div>
+            <div className="text-sm text-muted-foreground font-medium">USD Payout</div>
             <FormulaTooltip 
               formula="Net Robux ÷ 350"
               description="USD payout calculation"
@@ -82,11 +85,15 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
               }}
             />
           </div>
+          <div className="mt-3 text-xs text-primary/80 bg-primary/10 rounded-full px-3 py-1 inline-block">
+            Primary Earnings
+          </div>
         </div>
-        <div className="text-center p-4 bg-muted/50 rounded-lg">
-          <div className="text-2xl font-bold">{formatRobux(results.netRobux)}</div>
+        
+        <div className="text-center p-6 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl border">
+          <div className="text-3xl font-bold mb-2">{formatRobux(results.netRobux)}</div>
           <div className="flex items-center justify-center gap-2">
-            <div className="text-sm text-muted-foreground">Net Robux</div>
+            <div className="text-sm text-muted-foreground font-medium">Net Robux</div>
             <FormulaTooltip 
               formula="Gross Robux - Total Costs - Marketplace Fee"
               description="Net Robux calculation"
@@ -96,14 +103,17 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
               }}
             />
           </div>
+          <div className="mt-3 text-xs text-muted-foreground bg-muted/50 rounded-full px-3 py-1 inline-block">
+            After Deductions
+          </div>
         </div>
       </div>
 
       {/* Take Rate Highlight */}
-      <div className="mb-6 p-3 border border-border rounded-lg bg-background">
+      <div className="mb-8 p-4 border border-destructive/20 rounded-xl bg-gradient-to-r from-destructive/5 to-destructive/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Effective Take Rate:</span>
+            <span className="text-sm font-semibold">Effective Take Rate:</span>
             <FormulaTooltip 
               formula="((Gross Robux - Net Robux) ÷ Gross Robux) × 100"
               description="Your true cost percentage"
@@ -113,133 +123,156 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
               }}
             />
           </div>
-          <span className="font-bold text-destructive">{formatPercentage(results.effectiveTakeRate)}</span>
+          <div className="text-right">
+            <span className="font-bold text-destructive text-lg">{formatPercentage(results.effectiveTakeRate)}</span>
+            <div className="text-xs text-muted-foreground">Total Cost %</div>
+          </div>
         </div>
       </div>
 
-      {/* Gross Robux Input */}
-      <div className="space-y-2 mb-4">
-        <Label htmlFor="gross-robux">Gross Robux Earned</Label>
-        <Input
-          id="gross-robux"
-          type="number"
-          placeholder="10000"
-          value={grossRobux}
-          onChange={(e) => setGrossRobux(e.target.value)}
-          className="text-center text-lg font-semibold mobile-text-input mobile-touch-target focus-ring"
-        />
-      </div>
-
-      {/* Quick Costs */}
-      <div className="grid mobile-grid gap-3 mb-4">
-        <div>
-          <Label className="text-sm">Ad Spend</Label>
+      {/* Input Section */}
+      <div className="bg-muted/30 rounded-xl p-6 mb-6">
+        <h4 className="font-semibold mb-4 text-center">Revenue & Costs</h4>
+        
+        {/* Gross Robux Input */}
+        <div className="space-y-3 mb-6">
+          <Label htmlFor="gross-robux" className="text-sm font-medium">Gross Robux Earned</Label>
           <Input
+            id="gross-robux"
             type="number"
-            placeholder="0"
-            value={adSpend}
-            onChange={(e) => setAdSpend(e.target.value)}
+            placeholder="10000"
+            value={grossRobux}
+            onChange={(e) => setGrossRobux(e.target.value)}
+            className="text-center text-xl font-bold mobile-text-input mobile-touch-target focus-ring h-12"
           />
         </div>
-        <div>
-          <Label className="text-sm">Other Costs</Label>
-          <Input
-            type="number"
-            placeholder="0"
-            value={otherCosts}
-            onChange={(e) => setOtherCosts(e.target.value)}
-          />
-        </div>
-      </div>
 
-      {/* Advanced Costs Accordion */}
-      <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
-        <CollapsibleTrigger asChild>
-          <Button variant="ghost" className="w-full justify-between p-2 h-auto mobile-touch-target focus-ring">
-            <span className="text-sm">Advanced Costs</span>
-            {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-3 pt-3">
+        {/* Quick Costs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <Label className="text-sm">Group Splits</Label>
+            <Label className="text-sm font-medium">Ad Spend</Label>
             <Input
               type="number"
               placeholder="0"
-              value={groupSplits}
-              onChange={(e) => setGroupSplits(e.target.value)}
+              value={adSpend}
+              onChange={(e) => setAdSpend(e.target.value)}
+              className="mt-1"
             />
           </div>
           <div>
-            <Label className="text-sm">Affiliate Payouts</Label>
+            <Label className="text-sm font-medium">Other Costs</Label>
             <Input
               type="number"
               placeholder="0"
-              value={affiliatePayouts}
-              onChange={(e) => setAffiliatePayouts(e.target.value)}
+              value={otherCosts}
+              onChange={(e) => setOtherCosts(e.target.value)}
+              className="mt-1"
             />
           </div>
-          <div>
-            <Label className="text-sm">Refunds</Label>
-            <Input
-              type="number"
-              placeholder="0"
-              value={refunds}
-              onChange={(e) => setRefunds(e.target.value)}
-            />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+        </div>
+
+        {/* Advanced Costs Accordion */}
+        <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-between p-3 h-auto mobile-touch-target focus-ring rounded-lg border border-dashed">
+              <span className="text-sm font-medium">Advanced Cost Breakdown</span>
+              {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label className="text-sm font-medium">Group Splits</Label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={groupSplits}
+                  onChange={(e) => setGroupSplits(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Affiliate Payouts</Label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={affiliatePayouts}
+                  onChange={(e) => setAffiliatePayouts(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Refunds</Label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={refunds}
+                  onChange={(e) => setRefunds(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
 
       {/* Fee Breakdown Table */}
       {results.grossRobux > 0 && (
-        <div className="mt-6 space-y-2 p-3 bg-muted/30 rounded-lg">
-          <h4 className="font-medium text-sm mb-3">Fee Breakdown</h4>
+        <div className="mt-8 bg-gradient-to-br from-background to-muted/20 rounded-xl border p-6">
+          <h4 className="font-semibold text-base mb-4 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary"></div>
+            Detailed Breakdown
+          </h4>
           
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between">
-              <span>Marketplace Fee ({userType === 'gameDev' ? '30%' : '70%'}):</span>
-              <span>-{formatRobux(results.breakdown.marketplaceFee)}</span>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center py-2 border-b border-muted">
+              <span className="font-medium">Gross Revenue:</span>
+              <span className="font-bold text-primary">{formatRobux(results.grossRobux)}</span>
+            </div>
+            
+            <div className="flex justify-between items-center py-1">
+              <span className="text-muted-foreground">Marketplace Fee ({userType === 'gameDev' ? '30%' : '70%'}):</span>
+              <span className="text-destructive">-{formatRobux(results.breakdown.marketplaceFee)}</span>
             </div>
             
             {results.breakdown.adSpend > 0 && (
-              <div className="flex justify-between">
-                <span>Ad Spend:</span>
-                <span>-{formatRobux(results.breakdown.adSpend)}</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Ad Spend:</span>
+                <span className="text-destructive">-{formatRobux(results.breakdown.adSpend)}</span>
               </div>
             )}
             
             {results.breakdown.groupSplits > 0 && (
-              <div className="flex justify-between">
-                <span>Group Splits:</span>
-                <span>-{formatRobux(results.breakdown.groupSplits)}</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Group Splits:</span>
+                <span className="text-destructive">-{formatRobux(results.breakdown.groupSplits)}</span>
               </div>
             )}
             
             {results.breakdown.affiliatePayouts > 0 && (
-              <div className="flex justify-between">
-                <span>Affiliate Payouts:</span>
-                <span>-{formatRobux(results.breakdown.affiliatePayouts)}</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Affiliate Payouts:</span>
+                <span className="text-destructive">-{formatRobux(results.breakdown.affiliatePayouts)}</span>
               </div>
             )}
             
             {results.breakdown.refunds > 0 && (
-              <div className="flex justify-between">
-                <span>Refunds:</span>
-                <span>-{formatRobux(results.breakdown.refunds)}</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Refunds:</span>
+                <span className="text-destructive">-{formatRobux(results.breakdown.refunds)}</span>
               </div>
             )}
             
             {results.breakdown.otherCosts > 0 && (
-              <div className="flex justify-between">
-                <span>Other Costs:</span>
-                <span>-{formatRobux(results.breakdown.otherCosts)}</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Other Costs:</span>
+                <span className="text-destructive">-{formatRobux(results.breakdown.otherCosts)}</span>
               </div>
             )}
             
-            <div className="border-t border-border pt-1 mt-2 flex justify-between font-medium">
-              <span>Net Robux:</span>
-              <span className="text-primary">{formatRobux(results.netRobux)}</span>
+            <div className="border-t border-primary/20 pt-3 mt-4 flex justify-between items-center">
+              <span className="font-semibold text-base">Net Earnings:</span>
+              <span className="font-bold text-primary text-lg">{formatRobux(results.netRobux)}</span>
             </div>
           </div>
         </div>

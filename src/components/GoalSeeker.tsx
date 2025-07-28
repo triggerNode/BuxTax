@@ -55,17 +55,20 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
 
   return (
     <BuxCard 
-      title={`${userType === 'gameDev' ? 'Game Dev' : 'UGC Creator'} Goal Seeker`}
+      title="Goal Seeker"
       icon={Target}
+      variant="detailed"
+      size="lg"
+      userType={userType}
       shareData={shareData}
       dataSourceId="goal-seeker"
     >
       {/* Required Robux Display */}
       {requiredRobux > 0 && (
-        <div className="text-center p-4 bg-primary/5 rounded-lg mb-6">
-          <div className="text-2xl font-bold text-primary">{formatRobux(requiredRobux)}</div>
+        <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20 mb-8">
+          <div className="text-3xl font-bold text-primary mb-2">{formatRobux(requiredRobux)}</div>
           <div className="flex items-center justify-center gap-2">
-            <div className="text-sm text-muted-foreground">Required Gross Robux</div>
+            <div className="text-sm text-muted-foreground font-medium">Required Gross Robux</div>
             <FormulaTooltip 
               formula="(Target USD × 350 + Expected Costs) ÷ (1 - Marketplace Fee)"
               description="Reverse calculation to find required gross Robux"
@@ -77,52 +80,63 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
               }}
             />
           </div>
+          <div className="mt-3 text-xs text-primary/80 bg-primary/10 rounded-full px-3 py-1 inline-block">
+            Goal Target
+          </div>
         </div>
       )}
 
-      {/* Target USD Input */}
-      <div className="space-y-2 mb-4">
-        <Label htmlFor="target-usd">Target USD Payout</Label>
-        <Input
-          id="target-usd"
-          type="number"
-          placeholder="100"
-          value={targetPayout}
-          onChange={(e) => setTargetPayout(e.target.value)}
-          className="text-center text-lg font-semibold"
-        />
-      </div>
-
-      {/* Deadline Input */}
-      <div className="space-y-2 mb-4">
-        <Label htmlFor="deadline">Deadline (Optional)</Label>
-        <Input
-          id="deadline"
-          type="date"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-        />
-      </div>
-
-      {/* Expected Costs */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div>
-          <Label className="text-sm">Expected Ad Spend</Label>
+      {/* Input Section */}
+      <div className="bg-muted/30 rounded-xl p-6 mb-6">
+        <h4 className="font-semibold mb-4 text-center">Goal Settings</h4>
+        
+        {/* Target USD Input */}
+        <div className="space-y-3 mb-6">
+          <Label htmlFor="target-usd" className="text-sm font-medium">Target USD Payout</Label>
           <Input
+            id="target-usd"
             type="number"
-            placeholder="0"
-            value={expectedAdSpend}
-            onChange={(e) => setExpectedAdSpend(e.target.value)}
+            placeholder="100"
+            value={targetPayout}
+            onChange={(e) => setTargetPayout(e.target.value)}
+            className="text-center text-xl font-bold h-12"
           />
         </div>
-        <div>
-          <Label className="text-sm">Expected Other Costs</Label>
+
+        {/* Deadline Input */}
+        <div className="space-y-3 mb-6">
+          <Label htmlFor="deadline" className="text-sm font-medium">Deadline (Optional)</Label>
           <Input
-            type="number"
-            placeholder="0"
-            value={expectedOtherCosts}
-            onChange={(e) => setExpectedOtherCosts(e.target.value)}
+            id="deadline"
+            type="date"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            className="h-11"
           />
+        </div>
+
+        {/* Expected Costs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium">Expected Ad Spend</Label>
+            <Input
+              type="number"
+              placeholder="0"
+              value={expectedAdSpend}
+              onChange={(e) => setExpectedAdSpend(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm font-medium">Expected Other Costs</Label>
+            <Input
+              type="number"
+              placeholder="0"
+              value={expectedOtherCosts}
+              onChange={(e) => setExpectedOtherCosts(e.target.value)}
+              className="mt-1"
+            />
+          </div>
         </div>
       </div>
 
@@ -141,35 +155,48 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
 
       {/* Goal Summary */}
       {requiredRobux > 0 && (
-        <div className="p-3 bg-muted/30 rounded-lg">
-          <h4 className="font-medium text-sm mb-2">Goal Summary</h4>
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between">
-              <span>Target Payout:</span>
-              <span className="font-medium text-primary">{formatCurrency(parseFloat(targetPayout) || 0)}</span>
+        <div className="mt-8 bg-gradient-to-br from-background to-muted/20 rounded-xl border p-6">
+          <h4 className="font-semibold text-base mb-4 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary"></div>
+            Goal Summary
+          </h4>
+          
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center py-2 border-b border-muted">
+              <span className="font-medium">Target Payout:</span>
+              <span className="font-bold text-primary">{formatCurrency(parseFloat(targetPayout) || 0)}</span>
             </div>
+            
             {deadline && (
-              <div className="flex justify-between">
-                <span>Deadline:</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Deadline:</span>
                 <span>{new Date(deadline).toLocaleDateString()}</span>
               </div>
             )}
-            <div className="flex justify-between">
-              <span>Platform Fee ({userType === 'gameDev' ? '30%' : '70%'}):</span>
-              <span>-{formatRobux(requiredRobux * (userType === 'gameDev' ? 0.30 : 0.70))}</span>
+            
+            <div className="flex justify-between items-center py-1">
+              <span className="text-muted-foreground">Platform Fee ({userType === 'gameDev' ? '30%' : '70%'}):</span>
+              <span className="text-destructive">-{formatRobux(requiredRobux * (userType === 'gameDev' ? 0.30 : 0.70))}</span>
             </div>
+            
             {(parseFloat(expectedAdSpend) || 0) > 0 && (
-              <div className="flex justify-between">
-                <span>Expected Ad Spend:</span>
-                <span>-{formatRobux(parseFloat(expectedAdSpend) || 0)}</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Expected Ad Spend:</span>
+                <span className="text-destructive">-{formatRobux(parseFloat(expectedAdSpend) || 0)}</span>
               </div>
             )}
+            
             {(parseFloat(expectedOtherCosts) || 0) > 0 && (
-              <div className="flex justify-between">
-                <span>Expected Other Costs:</span>
-                <span>-{formatRobux(parseFloat(expectedOtherCosts) || 0)}</span>
+              <div className="flex justify-between items-center py-1">
+                <span className="text-muted-foreground">Expected Other Costs:</span>
+                <span className="text-destructive">-{formatRobux(parseFloat(expectedOtherCosts) || 0)}</span>
               </div>
             )}
+            
+            <div className="border-t border-primary/20 pt-3 mt-4 flex justify-between items-center">
+              <span className="font-semibold text-base">Required Revenue:</span>
+              <span className="font-bold text-primary text-lg">{formatRobux(requiredRobux)}</span>
+            </div>
           </div>
         </div>
       )}

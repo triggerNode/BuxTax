@@ -10,7 +10,9 @@ interface BuxCardProps {
   children: ReactNode;
   shareable?: boolean;
   dataSourceId?: string;
-  variant?: 'summary' | 'detailed';
+  variant?: 'summary' | 'detailed' | 'chart' | 'dashboard';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  userType?: 'gameDev' | 'ugcCreator';
   shareData?: {
     netEarnings?: number;
     effectiveTakeRate?: number;
@@ -26,22 +28,44 @@ export function BuxCard({
   shareable = true,
   dataSourceId,
   variant = 'summary',
+  size = 'md',
+  userType,
   shareData
 }: BuxCardProps) {
   const cardId = dataSourceId || `buxtax-card-${title.toLowerCase().replace(/\s+/g, '-')}`;
   
+  const getUserTypeIcon = () => {
+    if (userType === 'gameDev') return '🎮';
+    if (userType === 'ugcCreator') return '🎨';
+    return '';
+  };
+
   return (
     <Card 
       id={cardId}
-      className="w-full max-w-md mx-auto bg-card border-border shadow-lg mobile-card-padding"
+      variant={variant}
+      size={size}
+      className={`w-full mx-auto bg-card border-border mobile-card-padding ${userType === 'gameDev' ? 'theme-gamedev' : userType === 'ugcCreator' ? 'theme-ugc' : ''}`}
     >
       <CardHeader className="pb-4 mobile-card-padding">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Icon className="w-4 h-4 text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center relative">
+              <Icon className="w-5 h-5 text-primary" />
+              {userType && (
+                <div className="absolute -top-1 -right-1 text-xs bg-primary/20 rounded-full w-5 h-5 flex items-center justify-center">
+                  {getUserTypeIcon()}
+                </div>
+              )}
             </div>
-            <h3 className="text-lg font-semibold text-card-foreground">{title}</h3>
+            <div>
+              <h3 className="text-lg font-semibold text-card-foreground">{title}</h3>
+              {userType && (
+                <p className="text-xs text-muted-foreground">
+                  {userType === 'gameDev' ? 'Game Developer' : 'UGC Creator'}
+                </p>
+              )}
+            </div>
           </div>
           
           <div className="flex items-center gap-2">
