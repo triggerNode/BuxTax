@@ -28,8 +28,13 @@ export function BuxCard({
   variant = 'summary',
   shareData
 }: BuxCardProps) {
+  const cardId = dataSourceId || `buxtax-card-${title.toLowerCase().replace(/\s+/g, '-')}`;
+  
   return (
-    <Card className="w-full max-w-md mx-auto bg-card border-border shadow-lg">
+    <Card 
+      id={cardId}
+      className="w-full max-w-md mx-auto bg-card border-border shadow-lg"
+    >
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

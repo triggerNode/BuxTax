@@ -84,23 +84,22 @@ function downloadCanvas(canvas: HTMLCanvasElement, filename: string): void {
 }
 
 async function exportToPDF(canvas: HTMLCanvasElement, filename: string): Promise<void> {
-  // For now, we'll export as PNG since PDF generation requires additional libraries
-  // This can be enhanced with jsPDF later
-  const dataURL = canvas.toDataURL('image/png', 1.0);
+  const { jsPDF } = await import('jspdf');
   
-  // Convert to blob for download
-  const response = await fetch(dataURL);
-  const blob = await response.blob();
+  // Calculate dimensions to fit the canvas in the PDF
+  const imgWidth = 210; // A4 width in mm
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
   
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = filename.replace('.pdf', '.png'); // Fallback to PNG for now
+  const pdf = new jsPDF({
+    orientation: imgHeight > imgWidth ? 'portrait' : 'landscape',
+    unit: 'mm',
+    format: 'a4'
+  });
   
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const imgData = canvas.toDataURL('image/png', 1.0);
+  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
   
-  URL.revokeObjectURL(link.href);
+  pdf.save(filename);
 }
 
 export function generateShareableURL(data: any, cardType: string): string {

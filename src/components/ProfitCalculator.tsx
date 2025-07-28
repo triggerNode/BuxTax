@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { BuxCard } from "@/components/shared/BuxCard";
 import { useLiveCalculation } from "@/hooks/useLiveCalculation";
 import { formatCurrency, formatRobux, formatPercentage } from "@/lib/fees";
+import { FormulaTooltip } from "@/components/shared/FormulaTooltip";
 
 interface ProfitCalculatorProps {
   userType: 'gameDev' | 'ugcCreator';
@@ -42,7 +43,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
 
   return (
     <BuxCard 
-      title="Profit Calculator" 
+      title={`${userType === 'gameDev' ? 'Game Dev' : 'UGC Creator'} Profit Calculator`}
       icon={Calculator}
       shareData={shareData}
       dataSourceId="profit-calc"
@@ -51,31 +52,49 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
       <div className="grid grid-cols-2 gap-4 mb-6">
         <div className="text-center p-4 bg-primary/5 rounded-lg">
           <div className="text-2xl font-bold text-primary">{formatCurrency(results.usdPayout)}</div>
-          <div className="text-sm text-muted-foreground">USD Payout</div>
+          <div className="flex items-center justify-center gap-2">
+            <div className="text-sm text-muted-foreground">USD Payout</div>
+            <FormulaTooltip 
+              formula="Net Robux ÷ 350"
+              description="USD payout calculation"
+              variables={{
+                "Net Robux": "Gross Robux - All Costs - Marketplace Fee",
+                "350": "Current DevEx rate (Robux per USD)"
+              }}
+            />
+          </div>
         </div>
         <div className="text-center p-4 bg-muted/50 rounded-lg">
           <div className="text-2xl font-bold">{formatRobux(results.netRobux)}</div>
-          <div className="text-sm text-muted-foreground">Net Robux</div>
+          <div className="flex items-center justify-center gap-2">
+            <div className="text-sm text-muted-foreground">Net Robux</div>
+            <FormulaTooltip 
+              formula="Gross Robux - Total Costs - Marketplace Fee"
+              description="Net Robux calculation"
+              variables={{
+                "Marketplace Fee": `${userType === 'gameDev' ? '30%' : '70%'} of gross Robux`,
+                "Total Costs": "Sum of all your business expenses"
+              }}
+            />
+          </div>
         </div>
       </div>
 
       {/* Take Rate Highlight */}
       <div className="mb-6 p-3 border border-border rounded-lg bg-background">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Effective Take Rate:</span>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-1">
-                  <span className="font-bold text-destructive">{formatPercentage(results.effectiveTakeRate)}</span>
-                  <Info className="w-3 h-3 text-muted-foreground" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Total percentage lost to fees and costs</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Effective Take Rate:</span>
+            <FormulaTooltip 
+              formula="((Gross Robux - Net Robux) ÷ Gross Robux) × 100"
+              description="Your true cost percentage"
+              variables={{
+                "Gross Robux": "Total Robux earned before any deductions",
+                "Net Robux": "Final Robux after all costs and fees"
+              }}
+            />
+          </div>
+          <span className="font-bold text-destructive">{formatPercentage(results.effectiveTakeRate)}</span>
         </div>
       </div>
 

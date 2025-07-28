@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BuxCard } from "@/components/shared/BuxCard";
 import { calculateRequiredRobux, formatCurrency, formatRobux } from "@/lib/fees";
+import { FormulaTooltip } from "@/components/shared/FormulaTooltip";
 
 interface GoalSeekerProps {
   userType: 'gameDev' | 'ugcCreator';
@@ -33,7 +34,7 @@ export function GoalSeeker({ userType }: GoalSeekerProps) {
 
   return (
     <BuxCard 
-      title="Goal Seeker" 
+      title={`${userType === 'gameDev' ? 'Game Dev' : 'UGC Creator'} Goal Seeker`}
       icon={Target}
       shareData={shareData}
       dataSourceId="goal-seeker"
@@ -42,7 +43,19 @@ export function GoalSeeker({ userType }: GoalSeekerProps) {
       {requiredRobux > 0 && (
         <div className="text-center p-4 bg-primary/5 rounded-lg mb-6">
           <div className="text-2xl font-bold text-primary">{formatRobux(requiredRobux)}</div>
-          <div className="text-sm text-muted-foreground">Required Gross Robux</div>
+          <div className="flex items-center justify-center gap-2">
+            <div className="text-sm text-muted-foreground">Required Gross Robux</div>
+            <FormulaTooltip 
+              formula="(Target USD × 350 + Expected Costs) ÷ (1 - Marketplace Fee)"
+              description="Reverse calculation to find required gross Robux"
+              variables={{
+                "Target USD": "Your desired USD payout",
+                "350": "Current DevEx rate",
+                "Marketplace Fee": `${userType === 'gameDev' ? '30%' : '70%'} (Roblox fee)`,
+                "Expected Costs": "Your estimated business expenses"
+              }}
+            />
+          </div>
         </div>
       )}
 
