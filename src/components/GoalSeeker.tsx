@@ -1,69 +1,131 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useMemo } from "react";
+import { Target, Calendar, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BuxCard } from "@/components/shared/BuxCard";
+import { calculateRequiredRobux, formatCurrency, formatRobux } from "@/lib/fees";
 
 interface GoalSeekerProps {
   userType: 'gameDev' | 'ugcCreator';
 }
 
 export function GoalSeeker({ userType }: GoalSeekerProps) {
-  const [targetPayout, setTargetPayout] = useState("");
-  const [requiredRobux, setRequiredRobux] = useState<number | null>(null);
+  const [targetPayout, setTargetPayout] = useState("100");
+  const [deadline, setDeadline] = useState("");
+  const [expectedAdSpend, setExpectedAdSpend] = useState("0");
+  const [expectedOtherCosts, setExpectedOtherCosts] = useState("0");
 
-  const calculateRequiredRobux = () => {
+  // Live calculation of required Robux
+  const requiredRobux = useMemo(() => {
     const target = parseFloat(targetPayout) || 0;
-    
-    // DevEx rate: $3.50 = 1000 Robux
-    const robuxNeeded = (target / 3.50) * 1000;
-    
-    // Account for platform fee
-    const platformFeeRate = userType === 'gameDev' ? 0.30 : 0.70;
-    const grossRobuxNeeded = robuxNeeded / (1 - platformFeeRate);
-    
-    setRequiredRobux(grossRobuxNeeded);
+    if (target <= 0) return 0;
+
+    return calculateRequiredRobux(target, userType, {
+      adSpend: parseFloat(expectedAdSpend) || 0,
+      otherCosts: parseFloat(expectedOtherCosts) || 0,
+    });
+  }, [targetPayout, userType, expectedAdSpend, expectedOtherCosts]);
+
+  const shareData = {
+    nextGoal: parseFloat(targetPayout) || 0,
+    goalDeadline: deadline,
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-primary rounded-full"></span>
-          My Target Payout (USD)
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <BuxCard 
+      title="Goal Seeker" 
+      icon={Target}
+      shareData={shareData}
+      dataSourceId="goal-seeker"
+    >
+      {/* Required Robux Display */}
+      {requiredRobux > 0 && (
+        <div className="text-center p-4 bg-primary/5 rounded-lg mb-6">
+          <div className="text-2xl font-bold text-primary">{formatRobux(requiredRobux)}</div>
+          <div className="text-sm text-muted-foreground">Required Gross Robux</div>
+        </div>
+      )}
+
+      {/* Target USD Input */}
+      <div className="space-y-2 mb-4">
+        <Label htmlFor="target-usd">Target USD Payout</Label>
+        <Input
+          id="target-usd"
+          type="number"
+          placeholder="100"
+          value={targetPayout}
+          onChange={(e) => setTargetPayout(e.target.value)}
+          className="text-center text-lg font-semibold"
+        />
+      </div>
+
+      {/* Deadline Input */}
+      <div className="space-y-2 mb-4">
+        <Label htmlFor="deadline">Deadline (Optional)</Label>
+        <Input
+          id="deadline"
+          type="date"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+        />
+      </div>
+
+      {/* Expected Costs */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
         <div>
+          <Label className="text-sm">Expected Ad Spend</Label>
           <Input
             type="number"
-            placeholder="50"
-            value={targetPayout}
-            onChange={(e) => setTargetPayout(e.target.value)}
-            className="text-center"
+            placeholder="0"
+            value={expectedAdSpend}
+            onChange={(e) => setExpectedAdSpend(e.target.value)}
           />
         </div>
+        <div>
+          <Label className="text-sm">Expected Other Costs</Label>
+          <Input
+            type="number"
+            placeholder="0"
+            value={expectedOtherCosts}
+            onChange={(e) => setExpectedOtherCosts(e.target.value)}
+          />
+        </div>
+      </div>
 
-        <Button 
-          variant="action" 
-          className="w-full"
-          onClick={calculateRequiredRobux}
-        >
-          Calculate Required Robux
-        </Button>
-
-        {requiredRobux && (
-          <div className="mt-6 p-4 bg-muted rounded-lg space-y-2">
+      {/* Goal Summary */}
+      {requiredRobux > 0 && (
+        <div className="p-3 bg-muted/30 rounded-lg">
+          <h4 className="font-medium text-sm mb-2">Goal Summary</h4>
+          <div className="space-y-1 text-xs">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Required Gross Robux:</span>
-              <span className="font-bold text-primary">{requiredRobux.toLocaleString()} R$</span>
+              <span>Target Payout:</span>
+              <span className="font-medium text-primary">{formatCurrency(parseFloat(targetPayout) || 0)}</span>
             </div>
-            <div className="text-xs text-muted-foreground mt-2">
-              This accounts for Roblox's {userType === 'gameDev' ? '30%' : '70%'} platform fee
+            {deadline && (
+              <div className="flex justify-between">
+                <span>Deadline:</span>
+                <span>{new Date(deadline).toLocaleDateString()}</span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span>Platform Fee ({userType === 'gameDev' ? '30%' : '70%'}):</span>
+              <span>-{formatRobux(requiredRobux * (userType === 'gameDev' ? 0.30 : 0.70))}</span>
             </div>
+            {(parseFloat(expectedAdSpend) || 0) > 0 && (
+              <div className="flex justify-between">
+                <span>Expected Ad Spend:</span>
+                <span>-{formatRobux(parseFloat(expectedAdSpend) || 0)}</span>
+              </div>
+            )}
+            {(parseFloat(expectedOtherCosts) || 0) > 0 && (
+              <div className="flex justify-between">
+                <span>Expected Other Costs:</span>
+                <span>-{formatRobux(parseFloat(expectedOtherCosts) || 0)}</span>
+              </div>
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </BuxCard>
   );
 }
