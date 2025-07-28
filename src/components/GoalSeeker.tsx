@@ -7,12 +7,15 @@ import { calculateRequiredRobux, formatCurrency, formatRobux } from "@/lib/fees"
 import { FormulaTooltip } from "@/components/shared/FormulaTooltip";
 import { useDebounce } from "@/hooks/useDebounce";
 import { analytics } from "@/utils/analytics";
+import { GoalTracker } from "@/components/GoalTracker";
+import { ParsedPayoutData } from "@/utils/csvParser";
 
 interface GoalSeekerProps {
   userType: 'gameDev' | 'ugcCreator';
+  csvData?: ParsedPayoutData[];
 }
 
-export function GoalSeeker({ userType }: GoalSeekerProps) {
+export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
   const [targetPayout, setTargetPayout] = useState("100");
   const [deadline, setDeadline] = useState("");
   const [expectedAdSpend, setExpectedAdSpend] = useState("0");
@@ -122,6 +125,19 @@ export function GoalSeeker({ userType }: GoalSeekerProps) {
           />
         </div>
       </div>
+
+      {/* Goal Tracker - shows progress if CSV data is available */}
+      {csvData.length > 0 && parseFloat(targetPayout) > 0 && (
+        <GoalTracker
+          targetUSD={parseFloat(targetPayout)}
+          deadline={deadline}
+          csvData={csvData}
+          expectedCosts={{
+            adSpend: parseFloat(expectedAdSpend) || 0,
+            otherCosts: parseFloat(expectedOtherCosts) || 0,
+          }}
+        />
+      )}
 
       {/* Goal Summary */}
       {requiredRobux > 0 && (

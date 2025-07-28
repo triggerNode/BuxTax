@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Upload, Calendar, TrendingUp, Filter, Download } from "lucide-react";
+import { Upload, Calendar, TrendingUp, Filter, Download, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BuxCard } from "@/components/shared/BuxCard";
 import { FileUpload } from "@/components/shared/FileUpload";
-import { parseCSV, exportToCSV, ParsedPayoutData, CSVParseResult } from "@/utils/csvParser";
+import { parseCSV, exportToCSV, ParsedPayoutData, CSVParseResult, ColumnMapping } from "@/utils/csvParser";
 import { formatCurrency, formatRobux } from "@/lib/fees";
 import { useToast } from "@/hooks/use-toast";
+import { CSVColumnMapper } from "@/components/CSVColumnMapper";
 
 interface FeeBreakdown {
   category: string;
@@ -18,7 +19,11 @@ interface FeeBreakdown {
   percentage: number;
 }
 
-export function PayoutPulse() {
+interface PayoutPulseProps {
+  onDataChange?: (data: ParsedPayoutData[]) => void;
+}
+
+export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
   const { toast } = useToast();
   const [parsedData, setParsedData] = useState<ParsedPayoutData[]>([]);
   const [feeBreakdown, setFeeBreakdown] = useState<FeeBreakdown[]>([]);
@@ -26,12 +31,61 @@ export function PayoutPulse() {
   const [viewMode, setViewMode] = useState<"robux" | "usd">("usd");
   const [dateRange, setDateRange] = useState<"all" | "30d" | "90d">("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [showColumnMapper, setShowColumnMapper] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [detectedHeaders, setDetectedHeaders] = useState<string[]>([]);
+  const [suggestedMapping, setSuggestedMapping] = useState<ColumnMapping>({});
 
   const handleFileUpload = async (file: File) => {
     setIsLoading(true);
+    setPendingFile(file);
+    
     try {
       const csvContent = await file.text();
-      const result: CSVParseResult = await parseCSV(csvContent);
+      const lines = csvContent.split('\n').filter(line => line.trim());
+      if (lines.length === 0) throw new Error("Empty CSV file");
+      
+      // Extract headers from first line
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      setDetectedHeaders(headers);
+      
+      // Get suggested mapping by analyzing first few rows
+      const sampleData = lines.slice(0, 3).map(line => {
+        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+        const row: any = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] || '';
+        });
+        return row;
+      });
+      
+      // Auto-detect column mapping
+      const mapping = detectColumns(sampleData[0]);
+      setSuggestedMapping(mapping);
+      
+      // Show column mapper for user confirmation
+      setShowColumnMapper(true);
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: "Failed to analyze CSV file. Please check the format and try again.",
+        variant: "destructive",
+      });
+      setPendingFile(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMappingConfirm = async (mapping: ColumnMapping) => {
+    if (!pendingFile) return;
+    
+    setIsLoading(true);
+    setShowColumnMapper(false);
+    
+    try {
+      const csvContent = await pendingFile.text();
+      const result: CSVParseResult = await parseCSV(csvContent, mapping);
       
       if (result.errors.length > 0) {
         toast({
@@ -48,15 +102,55 @@ export function PayoutPulse() {
       
       setParsedData(result.data);
       generateFeeBreakdown(result.data);
+      onDataChange?.(result.data);
     } catch (error) {
       toast({
-        title: "Upload failed",
-        description: "Failed to parse CSV file. Please check the format and try again.",
+        title: "Processing failed",
+        description: "Failed to process CSV file with the provided mapping.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+      setPendingFile(null);
     }
+  };
+
+  const handleMappingCancel = () => {
+    setShowColumnMapper(false);
+    setPendingFile(null);
+    setDetectedHeaders([]);
+    setSuggestedMapping({});
+  };
+
+  // Helper function for column detection (moved from utils)
+  const detectColumns = (sampleRow: any): ColumnMapping => {
+    const headers = Object.keys(sampleRow).map(h => h.toLowerCase());
+    const mapping: ColumnMapping = {};
+
+    const patterns = {
+      date: /^(date|time|period|day|month)/i,
+      grossRobux: /^(gross|total|revenue|earnings|income).*(robux|r\$)/i,
+      netRobux: /^(net|final|payout).*(robux|r\$)/i,
+      marketplaceFee: /^(marketplace|platform|roblox).*(fee|cut|commission)/i,
+      adSpend: /^(ad|advertising|ads).*(spend|cost|expense)/i,
+      groupSplits: /^(group|split|share).*(payout|payment)/i,
+      affiliatePayouts: /^(affiliate|referral).*(payout|payment)/i,
+      refunds: /^(refund|chargeback|return)/i,
+      otherCosts: /^(other|misc|additional).*(cost|expense|fee)/i,
+    };
+
+    Object.keys(sampleRow).forEach(header => {
+      const lowerHeader = header.toLowerCase();
+      
+      for (const [field, pattern] of Object.entries(patterns)) {
+        if (pattern.test(lowerHeader)) {
+          mapping[field as keyof ColumnMapping] = header;
+          break;
+        }
+      }
+    });
+
+    return mapping;
   };
 
   const generateFeeBreakdown = (data: ParsedPayoutData[]) => {
@@ -168,6 +262,18 @@ export function PayoutPulse() {
     const totalNet = filtered.reduce((sum, item) => sum + item.netRobux, 0);
     return totalGross > 0 ? ((totalGross - totalNet) / totalGross) * 100 : 0;
   };
+
+  // Show column mapper if needed
+  if (showColumnMapper) {
+    return (
+      <CSVColumnMapper
+        csvHeaders={detectedHeaders}
+        suggestedMapping={suggestedMapping}
+        onMappingConfirm={handleMappingConfirm}
+        onCancel={handleMappingCancel}
+      />
+    );
+  }
 
   if (parsedData.length === 0) {
     return (

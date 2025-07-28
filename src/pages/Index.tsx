@@ -6,10 +6,12 @@ import { GoalSeeker } from "@/components/GoalSeeker";
 import { PayoutPulse } from "@/components/PayoutPulse";
 import { useLocalStorage, useUrlState } from "@/hooks/useLocalStorage";
 import { analytics } from "@/utils/analytics";
+import { ParsedPayoutData } from "@/utils/csvParser";
 
 const Index = () => {
   const [userType, setUserType] = useLocalStorage<'gameDev' | 'ugcCreator'>('buxtax-user-type', 'gameDev');
   const [activeTab, setActiveTab] = useUrlState<'profit' | 'goal' | 'pulse'>('tab', 'profit');
+  const [csvData, setCsvData] = useState<ParsedPayoutData[]>([]);
 
   // Track page views and user interactions
   useEffect(() => {
@@ -26,14 +28,19 @@ const Index = () => {
     analytics.track('tab_changed', { from: activeTab, to: newTab, userType });
   };
 
+  const handleCsvDataChange = (data: ParsedPayoutData[]) => {
+    setCsvData(data);
+    analytics.track('csv_data_loaded', { userType, recordCount: data.length });
+  };
+
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'profit':
         return <ProfitCalculator userType={userType} />;
       case 'goal':
-        return <GoalSeeker userType={userType} />;
+        return <GoalSeeker userType={userType} csvData={csvData} />;
       case 'pulse':
-        return <PayoutPulse />;
+        return <PayoutPulse onDataChange={handleCsvDataChange} />;
       default:
         return <ProfitCalculator userType={userType} />;
     }
