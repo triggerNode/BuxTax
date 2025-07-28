@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BuxCard } from "@/components/shared/BuxCard";
+import { ChartContainer } from "@/components/ui/chart-container";
 import { useLiveCalculation } from "@/hooks/useLiveCalculation";
 import { useDebounce } from "@/hooks/useDebounce";
 import { formatCurrency, formatRobux, formatPercentage } from "@/lib/fees";
@@ -142,8 +143,8 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
             type="number"
             placeholder="10000"
             value={grossRobux}
-            onChange={(e) => setGrossRobux(e.target.value)}
-            className="text-center text-xl font-bold mobile-text-input mobile-touch-target focus-ring h-12"
+              onChange={(e) => setGrossRobux(e.target.value)}
+              className="text-center text-xl font-bold mobile-text-input mobile-touch-friendly focus-ring h-12"
           />
         </div>
 

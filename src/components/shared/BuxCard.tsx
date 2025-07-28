@@ -40,12 +40,18 @@ export function BuxCard({
     return '';
   };
 
+  const getUserTypeTheme = () => {
+    if (userType === 'gameDev') return 'theme-gamedev';
+    if (userType === 'ugcCreator') return 'theme-ugc';
+    return '';
+  };
+
   return (
     <Card 
       id={cardId}
       variant={variant}
       size={size}
-      className={`w-full mx-auto bg-card border-border mobile-card-padding ${userType === 'gameDev' ? 'theme-gamedev' : userType === 'ugcCreator' ? 'theme-ugc' : ''}`}
+      className={`w-full mx-auto bg-card border-border mobile-card-padding card-hover ${getUserTypeTheme()}`}
     >
       <CardHeader className="pb-4 mobile-card-padding">
         <div className="flex items-center justify-between">

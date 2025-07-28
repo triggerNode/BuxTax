@@ -202,13 +202,96 @@
     @apply bg-card border-border shadow-md;
   }
 
-  /* User Type Styling */
+  /* Enhanced user type themes */
   .theme-gamedev {
-    @apply [--primary:239_84%_67%] [--primary-glow:239_84%_75%];
+    --primary: var(--gamedev-primary);
+    --primary-foreground: 0 0% 100%;
+    --accent: var(--gamedev-accent);
+    --muted: var(--gamedev-bg);
+    --border: var(--gamedev-border);
   }
-  
+
   .theme-ugc {
-    @apply [--primary:262_83%_58%] [--primary-glow:262_83%_70%];
+    --primary: var(--ugc-primary);
+    --primary-foreground: 0 0% 100%;
+    --accent: var(--ugc-accent);
+    --muted: var(--ugc-bg);
+    --border: var(--ugc-border);
+  }
+
+  /* Chart containers */
+  .chart-container {
+    min-height: var(--chart-height-md);
+    width: 100%;
+  }
+
+  .chart-container-sm {
+    min-height: var(--chart-height-sm);
+  }
+
+  .chart-container-lg {
+    min-height: var(--chart-height-lg);
+  }
+
+  /* Mobile optimizations */
+  .mobile-touch-friendly {
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
+  }
+
+  /* Table responsive scroll */
+  .table-scroll {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground)) transparent;
+  }
+
+  .table-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .table-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .table-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+
+  .table-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Enhanced loading states */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Enhanced card hover states */
+  .card-hover {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -8px hsl(var(--primary) / 0.1);
   }
 
   /* Responsive Tables */

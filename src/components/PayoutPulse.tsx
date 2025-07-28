@@ -2,7 +2,9 @@ import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Upload, Calendar, TrendingUp, Filter, Download, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { EnhancedTable, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/enhanced-table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ChartContainer as CustomChartContainer } from "@/components/ui/chart-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BuxCard } from "@/components/shared/BuxCard";
@@ -287,22 +289,29 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
         variant="detailed"
         size="lg"
       >
-        <div className="text-center py-12">
-          <FileUpload
-            onFileSelect={handleFileUpload}
-            accept=".csv"
-            maxSize={10}
-            className="max-w-md mx-auto"
-          />
-          <div className="mt-6 space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Upload your Roblox payout CSV to see detailed analytics
-            </p>
-            <p className="text-xs text-muted-foreground">
-              File processed locally - your data never leaves your device
-            </p>
+        <EmptyState
+          icon={Upload}
+          title="Upload Your Payout Data"
+          description="Upload your Roblox payout data (CSV, XLS, or XLSX) to analyze your earning trends and calculate precise profit margins."
+          action={{
+            label: "Choose File",
+            onClick: () => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()
+          }}
+        >
+          <div className="mt-4">
+            <FileUpload
+              onFileSelect={handleFileUpload}
+              accept=".csv"
+              maxSize={10}
+              className="max-w-md mx-auto"
+            />
+            <div className="mt-6 space-y-2">
+              <p className="text-xs text-muted-foreground">
+                File processed locally - your data never leaves your device
+              </p>
+            </div>
           </div>
-        </div>
+        </EmptyState>
       </BuxCard>
     );
   }
@@ -454,34 +463,46 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
           effectiveTakeRate: effectiveTakeRate,
         }}
       >
-        <div className="table-responsive">
-          <Table className="table-comfortable">
-            <TableHeader>
-              <TableRow className="border-b border-border">
-                <TableHead className="font-semibold">Category</TableHead>
-                <TableHead className="text-right font-semibold">Robux</TableHead>
-                <TableHead className="text-right font-semibold">USD</TableHead>
-                <TableHead className="text-right font-semibold">% of Gross</TableHead>
+        <EnhancedTable 
+          exportable 
+          onExport={() => {
+            const csvContent = "data:text/csv;charset=utf-8," 
+              + "Category,Robux,USD,Percentage\n"
+              + feeBreakdown.map(fee => `${fee.category},${fee.totalRobux},${fee.totalUSD.toFixed(2)},${fee.percentage.toFixed(1)}%`).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "fee_breakdown.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }}
+        >
+          <TableHeader>
+            <TableRow className="border-b border-border">
+              <TableHead className="font-semibold">Category</TableHead>
+              <TableHead className="text-right font-semibold">Robux</TableHead>
+              <TableHead className="text-right font-semibold">USD</TableHead>
+              <TableHead className="text-right font-semibold">% of Gross</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {feeBreakdown.map((fee, index) => (
+              <TableRow key={index} className="hover:bg-muted/30 transition-colors">
+                <TableCell className="font-medium py-3">{fee.category}</TableCell>
+                <TableCell className="text-right text-destructive font-mono py-3">
+                  -{formatRobux(fee.totalRobux)}
+                </TableCell>
+                <TableCell className="text-right text-destructive font-mono py-3">
+                  -{formatCurrency(fee.totalUSD)}
+                </TableCell>
+                <TableCell className="text-right font-semibold py-3">
+                  {fee.percentage.toFixed(1)}%
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {feeBreakdown.map((fee, index) => (
-                <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-medium py-3">{fee.category}</TableCell>
-                  <TableCell className="text-right text-destructive font-mono py-3">
-                    -{formatRobux(fee.totalRobux)}
-                  </TableCell>
-                  <TableCell className="text-right text-destructive font-mono py-3">
-                    -{formatCurrency(fee.totalUSD)}
-                  </TableCell>
-                  <TableCell className="text-right font-semibold py-3">
-                    {fee.percentage.toFixed(1)}%
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </EnhancedTable>
       </BuxCard>
     </div>
   );
