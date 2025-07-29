@@ -13,10 +13,10 @@ export function BuxTaxHeader({
   return <div className="text-center mb-8">
       <div className="mb-6">
         {/* Top row: BuxTax wordmark and primary actions */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="relative flex items-center justify-center mb-2">
           <h1 className="text-4xl font-bold text-primary">BuxTax</h1>
           
-          <div className="flex items-center gap-3 text-sm">
+          <div className="absolute right-0 flex items-center gap-3 text-sm">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground">
