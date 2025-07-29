@@ -15,6 +15,12 @@ export function BuxTaxHeader({ userType, onUserTypeChange }: BuxTaxHeaderProps) 
         <div className="flex-1" />
         <h1 className="text-4xl font-bold text-primary">BuxTax</h1>
         <div className="flex-1 flex justify-end gap-2">
+          <Button variant="ghost" size="sm">
+            Log In
+          </Button>
+          <Button variant="default" size="sm">
+            Get BuxTax
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

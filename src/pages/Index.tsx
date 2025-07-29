@@ -4,6 +4,7 @@ import { TabNavigation } from "@/components/TabNavigation";
 import { ProfitCalculator } from "@/components/ProfitCalculator";
 import { GoalSeeker } from "@/components/GoalSeeker";
 import { PayoutPulse } from "@/components/PayoutPulse";
+import { Footer } from "@/components/Footer";
 import { useLocalStorage, useUrlState } from "@/hooks/useLocalStorage";
 import { analytics } from "@/utils/analytics";
 import { ParsedPayoutData } from "@/utils/csvParser";
@@ -52,8 +53,8 @@ function IndexContent() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-background to-muted/20 py-8 ${userType === 'gameDev' ? 'theme-gamedev' : 'theme-ugc'}`}>
-      <div className="dashboard-container">
+    <div className={`min-h-screen bg-gradient-to-br from-background to-muted/20 py-8 ${userType === 'gameDev' ? 'theme-gamedev' : 'theme-ugc'} flex flex-col`}>
+      <div className="dashboard-container flex-1">
         <BuxTaxHeader 
           userType={userType} 
           onUserTypeChange={handleUserTypeChange}
@@ -70,6 +71,7 @@ function IndexContent() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
