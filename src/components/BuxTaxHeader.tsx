@@ -2,27 +2,20 @@ import { Button } from "@/components/ui/button";
 import { RatesDrawer } from "@/components/shared/RatesDrawer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { HelpCircle } from "lucide-react";
-
 interface BuxTaxHeaderProps {
   userType: 'gameDev' | 'ugcCreator';
   onUserTypeChange: (type: 'gameDev' | 'ugcCreator') => void;
 }
-
-export function BuxTaxHeader({ userType, onUserTypeChange }: BuxTaxHeaderProps) {
-  return (
-    <div className="text-center mb-8">
+export function BuxTaxHeader({
+  userType,
+  onUserTypeChange
+}: BuxTaxHeaderProps) {
+  return <div className="text-center mb-8">
       <div className="mb-6">
         {/* Top row: BuxTax wordmark and primary actions */}
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-4xl font-bold text-primary">BuxTax</h1>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm">
-              Log In
-            </Button>
-            <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">
-              Get BuxTax
-            </Button>
-          </div>
+          
         </div>
         
         {/* Bottom row: Utility functions */}
@@ -68,18 +61,10 @@ export function BuxTaxHeader({ userType, onUserTypeChange }: BuxTaxHeaderProps) 
       </div>
       
       <div className="flex justify-center gap-2 mb-6">
-        <Button
-          variant={userType === 'gameDev' ? 'default' : 'toggle'}
-          onClick={() => onUserTypeChange('gameDev')}
-          className="px-6"
-        >
+        <Button variant={userType === 'gameDev' ? 'default' : 'toggle'} onClick={() => onUserTypeChange('gameDev')} className="px-6">
           Game Dev
         </Button>
-        <Button
-          variant={userType === 'ugcCreator' ? 'default' : 'toggle'}
-          onClick={() => onUserTypeChange('ugcCreator')}
-          className="px-6"
-        >
+        <Button variant={userType === 'ugcCreator' ? 'default' : 'toggle'} onClick={() => onUserTypeChange('ugcCreator')} className="px-6">
           UGC Creator
         </Button>
       </div>
@@ -92,6 +77,5 @@ export function BuxTaxHeader({ userType, onUserTypeChange }: BuxTaxHeaderProps) 
           Calculate your true USD earnings after Roblox's hidden fees and taxes
         </p>
       </div>
-    </div>
-  );
+    </div>;
 }
