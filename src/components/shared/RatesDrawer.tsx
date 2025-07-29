@@ -50,9 +50,9 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 gap-2">
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <Settings className="h-4 w-4" />
-          Rates & Assumptions
+          <span className="sr-only">Rates & Assumptions</span>
         </Button>
       </SheetTrigger>
       
