@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { BuxTaxHeader } from "@/components/BuxTaxHeader";
 import { TabNavigation } from "@/components/TabNavigation";
 import { ProfitCalculator } from "@/components/ProfitCalculator";
@@ -7,11 +7,12 @@ import { PayoutPulse } from "@/components/PayoutPulse";
 import { useLocalStorage, useUrlState } from "@/hooks/useLocalStorage";
 import { analytics } from "@/utils/analytics";
 import { ParsedPayoutData } from "@/utils/csvParser";
+import { AppStateProvider, useClearUserType } from "@/contexts/AppStateContext";
 
-const Index = () => {
+function IndexContent() {
   const [userType, setUserType] = useLocalStorage<'gameDev' | 'ugcCreator'>('buxtax-user-type', 'gameDev');
   const [activeTab, setActiveTab] = useUrlState<'profit' | 'goal' | 'pulse'>('tab', 'profit');
-  const [csvData, setCsvData] = useState<ParsedPayoutData[]>([]);
+  const clearUserType = useClearUserType();
 
   // Track page views and user interactions
   useEffect(() => {
@@ -19,6 +20,8 @@ const Index = () => {
   }, []);
 
   const handleUserTypeChange = (newUserType: 'gameDev' | 'ugcCreator') => {
+    // Clear the previous user type's state
+    clearUserType(userType);
     setUserType(newUserType);
     analytics.track('user_type_changed', { from: userType, to: newUserType });
   };
@@ -29,21 +32,23 @@ const Index = () => {
   };
 
   const handleCsvDataChange = (data: ParsedPayoutData[]) => {
-    setCsvData(data);
     analytics.track('csv_data_loaded', { userType, recordCount: data.length });
   };
 
-  const renderActiveTab = () => {
-    switch (activeTab) {
-      case 'profit':
-        return <ProfitCalculator userType={userType} />;
-      case 'goal':
-        return <GoalSeeker userType={userType} csvData={csvData} />;
-      case 'pulse':
-        return <PayoutPulse onDataChange={handleCsvDataChange} />;
-      default:
-        return <ProfitCalculator userType={userType} />;
-    }
+  const renderTabs = () => {
+    return (
+      <div className="space-y-8">
+        <div className={activeTab !== 'profit' ? 'hidden' : ''}>
+          <ProfitCalculator userType={userType} />
+        </div>
+        <div className={activeTab !== 'goal' ? 'hidden' : ''}>
+          <GoalSeeker userType={userType} />
+        </div>
+        <div className={activeTab !== 'pulse' ? 'hidden' : ''}>
+          <PayoutPulse userType={userType} onDataChange={handleCsvDataChange} />
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -61,11 +66,19 @@ const Index = () => {
         
         <div className="dashboard-grid">
           <div className="lg:col-span-12">
-            {renderActiveTab()}
+            {renderTabs()}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+const Index = () => {
+  return (
+    <AppStateProvider>
+      <IndexContent />
+    </AppStateProvider>
   );
 };
 

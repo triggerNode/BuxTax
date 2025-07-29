@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, memo } from "react";
 import { Target, Calendar, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,17 +9,21 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { analytics } from "@/utils/analytics";
 import { GoalTracker } from "@/components/GoalTracker";
 import { ParsedPayoutData } from "@/utils/csvParser";
+import { useGoalSeekerState } from "@/contexts/AppStateContext";
 
 interface GoalSeekerProps {
   userType: 'gameDev' | 'ugcCreator';
-  csvData?: ParsedPayoutData[];
 }
 
-export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
-  const [targetPayout, setTargetPayout] = useState("100");
-  const [deadline, setDeadline] = useState("");
-  const [expectedAdSpend, setExpectedAdSpend] = useState("0");
-  const [expectedOtherCosts, setExpectedOtherCosts] = useState("0");
+const GoalSeeker = memo(function GoalSeeker({ userType }: GoalSeekerProps) {
+  const { goalState, updateState, csvData } = useGoalSeekerState(userType);
+  
+  const {
+    targetPayout,
+    deadline,
+    expectedAdSpend,
+    expectedOtherCosts,
+  } = goalState;
 
   // Debounce inputs for better performance
   const debouncedTargetPayout = useDebounce(parseFloat(targetPayout) || 0, 300);
@@ -97,8 +101,8 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
             id="target-usd"
             type="number"
             placeholder="100"
-            value={targetPayout}
-            onChange={(e) => setTargetPayout(e.target.value)}
+              value={targetPayout}
+              onChange={(e) => updateState({ targetPayout: e.target.value })}
             className="text-center text-xl font-bold h-12"
           />
         </div>
@@ -109,8 +113,8 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
           <Input
             id="deadline"
             type="date"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
+              value={deadline}
+              onChange={(e) => updateState({ deadline: e.target.value })}
             className="h-11"
           />
         </div>
@@ -123,7 +127,7 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
               type="number"
               placeholder="0"
               value={expectedAdSpend}
-              onChange={(e) => setExpectedAdSpend(e.target.value)}
+              onChange={(e) => updateState({ expectedAdSpend: e.target.value })}
               className="mt-1"
             />
           </div>
@@ -133,7 +137,7 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
               type="number"
               placeholder="0"
               value={expectedOtherCosts}
-              onChange={(e) => setExpectedOtherCosts(e.target.value)}
+              onChange={(e) => updateState({ expectedOtherCosts: e.target.value })}
               className="mt-1"
             />
           </div>
@@ -202,4 +206,6 @@ export function GoalSeeker({ userType, csvData = [] }: GoalSeekerProps) {
       )}
     </BuxCard>
   );
-}
+});
+
+export { GoalSeeker };

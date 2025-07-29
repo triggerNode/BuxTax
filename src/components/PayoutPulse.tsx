@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Upload, Calendar, TrendingUp, Filter, Download, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { parseCSV, exportToCSV, ParsedPayoutData, CSVParseResult, ColumnMapping 
 import { formatCurrency, formatRobux } from "@/lib/fees";
 import { useToast } from "@/hooks/use-toast";
 import { CSVColumnMapper } from "@/components/CSVColumnMapper";
+import { usePayoutPulseState } from "@/contexts/AppStateContext";
 
 interface FeeBreakdown {
   category: string;
@@ -22,24 +23,31 @@ interface FeeBreakdown {
 }
 
 interface PayoutPulseProps {
+  userType: 'gameDev' | 'ugcCreator';
   onDataChange?: (data: ParsedPayoutData[]) => void;
 }
 
-export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
+const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: PayoutPulseProps) {
   const { toast } = useToast();
-  const [parsedData, setParsedData] = useState<ParsedPayoutData[]>([]);
-  const [feeBreakdown, setFeeBreakdown] = useState<FeeBreakdown[]>([]);
-  const [timePeriod, setTimePeriod] = useState<"daily" | "weekly">("daily");
-  const [viewMode, setViewMode] = useState<"robux" | "usd">("usd");
-  const [dateRange, setDateRange] = useState<"all" | "30d" | "90d">("all");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showColumnMapper, setShowColumnMapper] = useState(false);
+  const { pulseState, updateState, setCsvData, getCsvData } = usePayoutPulseState(userType);
+  
+  const {
+    parsedData,
+    timePeriod,
+    viewMode,
+    dateRange,
+    isLoading,
+    showColumnMapper,
+    detectedHeaders,
+    suggestedMapping,
+  } = pulseState;
+  
+  // Local state for file handling
   const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [detectedHeaders, setDetectedHeaders] = useState<string[]>([]);
-  const [suggestedMapping, setSuggestedMapping] = useState<ColumnMapping>({});
+  const [feeBreakdown, setFeeBreakdown] = useState<FeeBreakdown[]>([]);
 
   const handleFileUpload = async (file: File) => {
-    setIsLoading(true);
+    updateState({ isLoading: true });
     setPendingFile(file);
     
     try {
@@ -49,7 +57,7 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       
       // Extract headers from first line
       const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-      setDetectedHeaders(headers);
+      updateState({ detectedHeaders: headers });
       
       // Get suggested mapping by analyzing first few rows
       const sampleData = lines.slice(0, 3).map(line => {
@@ -63,10 +71,10 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       
       // Auto-detect column mapping
       const mapping = detectColumns(sampleData[0]);
-      setSuggestedMapping(mapping);
-      
-      // Show column mapper for user confirmation
-      setShowColumnMapper(true);
+      updateState({ 
+        suggestedMapping: mapping,
+        showColumnMapper: true 
+      });
     } catch (error) {
       toast({
         title: "Upload failed",
@@ -75,15 +83,17 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       });
       setPendingFile(null);
     } finally {
-      setIsLoading(false);
+      updateState({ isLoading: false });
     }
   };
 
   const handleMappingConfirm = async (mapping: ColumnMapping) => {
     if (!pendingFile) return;
     
-    setIsLoading(true);
-    setShowColumnMapper(false);
+    updateState({ 
+      isLoading: true,
+      showColumnMapper: false 
+    });
     
     try {
       const csvContent = await pendingFile.text();
@@ -103,7 +113,7 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
         });
       }
       
-      setParsedData(result.data);
+      setCsvData(result.data);
       generateFeeBreakdown(result.data);
       onDataChange?.(result.data);
     } catch (error) {
@@ -113,16 +123,18 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      updateState({ isLoading: false });
       setPendingFile(null);
     }
   };
 
   const handleMappingCancel = () => {
-    setShowColumnMapper(false);
+    updateState({
+      showColumnMapper: false,
+      detectedHeaders: [],
+      suggestedMapping: {},
+    });
     setPendingFile(null);
-    setDetectedHeaders([]);
-    setSuggestedMapping({});
   };
 
   // Helper function for column detection (moved from utils)
@@ -221,9 +233,10 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
   };
 
   const getFilteredData = () => {
-    if (!parsedData.length) return [];
+    const currentData = getCsvData();
+    if (!currentData.length) return [];
     
-    let filtered = [...parsedData];
+    let filtered = [...currentData];
     
     // Apply date range filter
     if (dateRange !== "all") {
@@ -272,16 +285,16 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
   // Show column mapper if needed
   if (showColumnMapper) {
     return (
-      <CSVColumnMapper
-        csvHeaders={detectedHeaders}
-        suggestedMapping={suggestedMapping}
-        onMappingConfirm={handleMappingConfirm}
-        onCancel={handleMappingCancel}
-      />
+        <CSVColumnMapper
+          csvHeaders={detectedHeaders}
+          suggestedMapping={suggestedMapping}
+          onMappingConfirm={handleMappingConfirm}
+          onCancel={handleMappingCancel}
+        />
     );
   }
 
-  if (parsedData.length === 0) {
+  if (getCsvData().length === 0) {
     return (
       <BuxCard 
         title="Payout Pulse" 
@@ -355,14 +368,14 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       {/* Controls */}
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex gap-4">
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "robux" | "usd")}>
+          <Tabs value={viewMode} onValueChange={(value) => updateState({ viewMode: value as "robux" | "usd" })}>
             <TabsList>
               <TabsTrigger value="usd">USD View</TabsTrigger>
               <TabsTrigger value="robux">Robux View</TabsTrigger>
             </TabsList>
           </Tabs>
 
-          <Select value={dateRange} onValueChange={(value) => setDateRange(value as "all" | "30d" | "90d")}>
+          <Select value={dateRange} onValueChange={(value) => updateState({ dateRange: value as "all" | "30d" | "90d" })}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -491,4 +504,6 @@ export function PayoutPulse({ onDataChange }: PayoutPulseProps) {
       </BuxCard>
     </div>
   );
-}
+});
+
+export { PayoutPulse };

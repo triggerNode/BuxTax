@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, memo } from "react";
 import { Calculator, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,19 +12,24 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { formatCurrency, formatRobux, formatPercentage } from "@/lib/fees";
 import { FormulaTooltip } from "@/components/shared/FormulaTooltip";
 import { analytics } from "@/utils/analytics";
+import { useProfitCalculatorState } from "@/contexts/AppStateContext";
 
 interface ProfitCalculatorProps {
   userType: 'gameDev' | 'ugcCreator';
 }
 
-export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
-  const [grossRobux, setGrossRobux] = useState("10000");
-  const [adSpend, setAdSpend] = useState("0");
-  const [groupSplits, setGroupSplits] = useState("0");
-  const [affiliatePayouts, setAffiliatePayouts] = useState("0");
-  const [refunds, setRefunds] = useState("0");
-  const [otherCosts, setOtherCosts] = useState("0");
-  const [showAdvanced, setShowAdvanced] = useState(false);
+const ProfitCalculator = memo(function ProfitCalculator({ userType }: ProfitCalculatorProps) {
+  const { profitState, updateState } = useProfitCalculatorState(userType);
+  
+  const {
+    grossRobux,
+    adSpend,
+    groupSplits,
+    affiliatePayouts,
+    refunds,
+    otherCosts,
+    showAdvanced,
+  } = profitState;
 
   // Debounce inputs for better performance
   const debouncedGrossRobux = useDebounce(parseFloat(grossRobux) || 0, 300);
@@ -143,7 +148,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
             type="number"
             placeholder="10000"
             value={grossRobux}
-              onChange={(e) => setGrossRobux(e.target.value)}
+              onChange={(e) => updateState({ grossRobux: e.target.value })}
               className="text-center text-xl font-bold mobile-text-input mobile-touch-friendly focus-ring h-12"
           />
         </div>
@@ -156,7 +161,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
               type="number"
               placeholder="0"
               value={adSpend}
-              onChange={(e) => setAdSpend(e.target.value)}
+              onChange={(e) => updateState({ adSpend: e.target.value })}
               className="mt-1"
             />
           </div>
@@ -166,14 +171,14 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
               type="number"
               placeholder="0"
               value={otherCosts}
-              onChange={(e) => setOtherCosts(e.target.value)}
+              onChange={(e) => updateState({ otherCosts: e.target.value })}
               className="mt-1"
             />
           </div>
         </div>
 
         {/* Advanced Costs Accordion */}
-        <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+        <Collapsible open={showAdvanced} onOpenChange={(open) => updateState({ showAdvanced: open })}>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="w-full justify-between p-3 h-auto mobile-touch-target focus-ring rounded-lg border border-dashed">
               <span className="text-sm font-medium">Advanced Cost Breakdown</span>
@@ -188,7 +193,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
                   type="number"
                   placeholder="0"
                   value={groupSplits}
-                  onChange={(e) => setGroupSplits(e.target.value)}
+                  onChange={(e) => updateState({ groupSplits: e.target.value })}
                   className="mt-1"
                 />
               </div>
@@ -198,7 +203,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
                   type="number"
                   placeholder="0"
                   value={affiliatePayouts}
-                  onChange={(e) => setAffiliatePayouts(e.target.value)}
+                  onChange={(e) => updateState({ affiliatePayouts: e.target.value })}
                   className="mt-1"
                 />
               </div>
@@ -208,7 +213,7 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
                   type="number"
                   placeholder="0"
                   value={refunds}
-                  onChange={(e) => setRefunds(e.target.value)}
+                  onChange={(e) => updateState({ refunds: e.target.value })}
                   className="mt-1"
                 />
               </div>
@@ -280,4 +285,6 @@ export function ProfitCalculator({ userType }: ProfitCalculatorProps) {
       )}
     </BuxCard>
   );
-}
+});
+
+export { ProfitCalculator };
