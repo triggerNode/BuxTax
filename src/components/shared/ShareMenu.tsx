@@ -124,7 +124,10 @@ export function ShareMenu({ dataSourceId, shareData, cardTitle }: ShareMenuProps
     
     try {
       const { exportCard } = await import('@/utils/exportUtils');
-      const elementId = dataSourceId || 'main-content';
+      // Generate the same ID format that BuxCard uses
+      const elementId = dataSourceId || `buxtax-card-${cardTitle.toLowerCase().replace(/\s+/g, '-')}`;
+      
+      console.log('Attempting to export element with ID:', elementId);
       
       await exportCard(elementId, {
         format,

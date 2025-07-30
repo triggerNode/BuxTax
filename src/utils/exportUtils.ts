@@ -27,8 +27,14 @@ export async function exportCard(
   }
 
   try {
+    console.log('Found element to export:', element);
+    console.log('Element dimensions:', { width: element.offsetWidth, height: element.offsetHeight });
+    
     // Add export class for styling during capture
     element.classList.add('exporting');
+    
+    // Wait a bit for any dynamic content to render
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     const canvas = await html2canvas(element, {
       backgroundColor: '#ffffff',
@@ -42,6 +48,14 @@ export async function exportCard(
       removeContainer: true,
       scrollX: 0,
       scrollY: 0,
+      onclone: (clonedDoc) => {
+        // Ensure styles are preserved in the clone
+        const clonedElement = clonedDoc.getElementById(element.id);
+        if (clonedElement) {
+          clonedElement.style.transform = 'none';
+          clonedElement.style.position = 'static';
+        }
+      }
     });
 
     // Remove export class
