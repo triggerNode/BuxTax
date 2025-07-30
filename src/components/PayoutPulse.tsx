@@ -428,7 +428,7 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
                   backgroundColor: 'hsl(var(--background))',
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  boxShadow: '0 4px 6px -1px hsl(var(--foreground) / 0.1)',
                 }}
                 formatter={(value: number) => [
                   viewMode === "robux" ? formatRobux(value) : formatCurrency(value),

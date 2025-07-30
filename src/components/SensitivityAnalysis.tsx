@@ -41,8 +41,8 @@ export function SensitivityAnalysis({ baseRobux, userType, baseCosts }: Sensitiv
   const getChangeIndicator = (current: number, base: number) => {
     const change = ((current - base) / base) * 100;
     if (Math.abs(change) < 0.1) return { icon: Minus, color: "text-muted-foreground", text: "0%" };
-    if (change > 0) return { icon: TrendingUp, color: "text-green-500", text: `+${change.toFixed(1)}%` };
-    return { icon: TrendingDown, color: "text-red-500", text: `${change.toFixed(1)}%` };
+      if (change > 0) return { icon: TrendingUp, color: "text-success", text: `+${change.toFixed(1)}%` };
+  return { icon: TrendingDown, color: "text-destructive", text: `${change.toFixed(1)}%` };
   };
 
   const profitChange = getChangeIndicator(sensitivityResult.usdPayout, baseResult.usdPayout);

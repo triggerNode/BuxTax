@@ -125,7 +125,7 @@ export function CSVColumnMapper({ csvHeaders, suggestedMapping, onMappingConfirm
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="font-medium">{config.label}</span>
-            {status === "mapped" && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+            {status === "mapped" && <CheckCircle2 className="h-4 w-4 text-success" />}
             {status === "error" && <AlertCircle className="h-4 w-4 text-destructive" />}
             {isRequired && <Badge variant="secondary" className="text-xs">Required</Badge>}
           </div>

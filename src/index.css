@@ -6,57 +6,63 @@
 
 @layer base {
   :root {
-    --background: 240 10% 98%;
-    --foreground: 224 71.4% 4.1%;
+    --background: 60 25% 95%; /* Cream #FAFAED */
+    --foreground: 0 0% 0%; /* Black #000000 */
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card: 60 25% 95%; /* Cream #FAFAED */
+    --card-foreground: 0 0% 0%; /* Black #000000 */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
+    --popover: 60 25% 95%; /* Cream #FAFAED */
+    --popover-foreground: 0 0% 0%; /* Black #000000 */
 
     /* BuxTax Brand Colors */
-    --primary: 239 84% 67%; /* Blue #4F46E5 */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 239 84% 75%;
+    --primary: 237 89% 52%; /* Royal Blue #1820EF */
+    --primary-foreground: 60 25% 95%; /* Cream #FAFAED */
+    --primary-glow: 237 89% 60%; /* Lighter Royal Blue */
     
     /* User Type Themes */
-    --gamedev-primary: 239 84% 67%; /* Blue theme for Game Devs */
-    --gamedev-accent: 220 70% 50%;
-    --gamedev-glow: 239 84% 75%;
+    --gamedev-primary: 237 89% 52%; /* Royal Blue theme for Game Devs */
+    --gamedev-accent: 237 89% 52%;
+    --gamedev-glow: 237 89% 60%;
     
-    --ugc-primary: 262 83% 58%; /* Purple theme for UGC Creators */
-    --ugc-accent: 280 70% 50%;
-    --ugc-glow: 262 83% 70%;
+    --ugc-primary: 237 89% 52%; /* Royal Blue theme for UGC Creators */
+    --ugc-accent: 237 89% 52%;
+    --ugc-glow: 237 89% 60%;
 
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
+    --secondary: 60 25% 95%; /* Cream #FAFAED (ghost button fill) */
+    --secondary-foreground: 0 0% 0%; /* Black #000000 (text & border) */
 
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
+    --muted: 60 25% 95%; /* Cream #FAFAED */
+    --muted-foreground: 0 0% 0%; /* Black #000000 */
 
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
+    --accent: 237 89% 52%; /* Royal Blue #1820EF */
+    --accent-foreground: 60 25% 95%; /* Cream #FAFAED */
 
     /* Action Colors */
-    --action: 4 89% 65%; /* Coral/Red for buttons */
-    --action-foreground: 0 0% 100%;
-    --action-hover: 4 89% 58%;
+    --action: 8 100% 63%; /* Cherry Red #FF4E42 */
+    --action-foreground: 60 25% 95%; /* Cream #FAFAED (text on red) */
+    --action-hover: 8 100% 56%; /* darker red hover */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 8 100% 63%; /* Cherry Red #FF4E42 (same as action) */
+    --destructive-foreground: 60 25% 95%; /* Cream #FAFAED */
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 239 84% 67%;
+    --border: 0 0% 0%; /* Black #000000 */
+    --input: 0 0% 0%; /* Black #000000 */
+    --ring: 237 89% 52%; /* Royal Blue #1820EF */
 
     --radius: 0.75rem;
 
     /* Chart Colors */
-    --chart-blue: 239 84% 67%;
-    --chart-purple: 262 83% 58%;
-    --chart-green: 142 76% 36%;
-    --chart-orange: 25 95% 53%;
+    --chart-blue: 237 89% 52%; /* Royal Blue #1820EF */
+    --chart-purple: 8 100% 63%; /* Cherry Red #FF4E42 */
+    --chart-green: 48 100% 59%; /* Yellow #FFC024 */
+    --chart-orange: 360 68% 33%; /* Burgundy #832626 */
+
+    /* Additional Brand Colors */
+    --success: 48 100% 59%; /* Yellow #FFC024 */
+    --success-foreground: 0 0% 0%; /* Black #000000 */
+    --burgundy-accent: 360 68% 33%; /* Burgundy #832626 */
+    --burgundy-foreground: 60 25% 95%; /* Cream #FAFAED */
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
@@ -71,59 +77,59 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 60 25% 95%; /* Cream #FAFAED */
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-foreground: 0 0% 0%; /* Black #000000 */
 
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 237 89% 52%; /* Royal Blue #1820EF */
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary-foreground: 60 25% 95%; /* Cream #FAFAED */
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 60 25% 95%; /* Cream #FAFAED */
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 0 0% 0%; /* Black #000000 */
 
-    --sidebar-border: 220 13% 91%;
+    --sidebar-border: 0 0% 0%; /* Black #000000 */
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 237 89% 52%; /* Royal Blue #1820EF */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 5%; /* Dark cream */
+    --foreground: 60 25% 95%; /* Light cream */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 8%; /* Darker card background */
+    --card-foreground: 60 25% 95%; /* Light cream text */
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 8%; /* Dark popover */
+    --popover-foreground: 60 25% 95%; /* Light cream text */
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 237 89% 52%; /* Keep Royal Blue */
+    --primary-foreground: 60 25% 95%; /* Light cream */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 15%; /* Dark secondary */
+    --secondary-foreground: 60 25% 95%; /* Light cream */
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 12%; /* Dark muted */
+    --muted-foreground: 60 25% 85%; /* Slightly darker cream */
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 237 89% 52%; /* Royal Blue */
+    --accent-foreground: 60 25% 95%; /* Light cream */
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 8 100% 63%; /* Keep Cherry Red */
+    --destructive-foreground: 60 25% 95%; /* Light cream */
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 0 0% 20%; /* Dark border */
+    --input: 0 0% 20%; /* Dark input border */
+    --ring: 237 89% 52%; /* Royal Blue focus ring */
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 60 25% 95%;
+    --sidebar-primary: 237 89% 52%;
+    --sidebar-primary-foreground: 60 25% 95%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 60 25% 95%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 237 89% 52%;
   }
 }
 
