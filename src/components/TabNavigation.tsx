@@ -18,12 +18,12 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
         {tabs.map((tab) => (
           <Button
             key={tab.id}
-            variant={activeTab === tab.id ? 'default' : 'ghost'}
+            variant="ghost"
             onClick={() => onTabChange(tab.id)}
             className={`relative px-8 py-3 font-medium transition-all duration-200 ${
               activeTab === tab.id 
-                ? 'bg-background shadow-md text-primary border border-primary/20' 
-                : 'hover:bg-background/60 text-muted-foreground hover:text-foreground'
+                ? 'bg-background shadow-md text-primary border border-primary/20 hover:bg-background/80 hover:text-primary' 
+                : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'
             }`}
           >
             {tab.label}
