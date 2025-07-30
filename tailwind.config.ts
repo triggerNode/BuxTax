@@ -58,6 +58,14 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				burgundy: {
+					DEFAULT: 'hsl(var(--burgundy-accent))',
+					foreground: 'hsl(var(--burgundy-foreground))'
+				},
 				chart: {
 					blue: 'hsl(var(--chart-blue))',
 					purple: 'hsl(var(--chart-purple))',
