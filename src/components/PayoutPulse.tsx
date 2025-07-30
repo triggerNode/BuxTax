@@ -1,15 +1,49 @@
 import { memo, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Upload, Calendar, TrendingUp, Filter, Download, Settings } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Upload,
+  Calendar,
+  TrendingUp,
+  Filter,
+  Download,
+  Settings,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EnhancedTable, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/enhanced-table";
+import {
+  EnhancedTable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/enhanced-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ChartContainer as CustomChartContainer } from "@/components/ui/chart-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { BuxCard } from "@/components/shared/BuxCard";
 import { FileUpload } from "@/components/shared/FileUpload";
-import { parseCSV, exportToCSV, ParsedPayoutData, CSVParseResult, ColumnMapping } from "@/utils/csvParser";
+import {
+  parseCSV,
+  exportToCSV,
+  ParsedPayoutData,
+  CSVParseResult,
+  ColumnMapping,
+} from "@/utils/csvParser";
 import { formatCurrency, formatRobux } from "@/lib/fees";
 import { useToast } from "@/hooks/use-toast";
 import { CSVColumnMapper } from "@/components/CSVColumnMapper";
@@ -23,14 +57,18 @@ interface FeeBreakdown {
 }
 
 interface PayoutPulseProps {
-  userType: 'gameDev' | 'ugcCreator';
+  userType: "gameDev" | "ugcCreator";
   onDataChange?: (data: ParsedPayoutData[]) => void;
 }
 
-const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: PayoutPulseProps) {
+const PayoutPulse = memo(function PayoutPulse({
+  userType,
+  onDataChange,
+}: PayoutPulseProps) {
   const { toast } = useToast();
-  const { pulseState, updateState, setCsvData, getCsvData } = usePayoutPulseState(userType);
-  
+  const { pulseState, updateState, setCsvData, getCsvData } =
+    usePayoutPulseState(userType);
+
   const {
     parsedData,
     timePeriod,
@@ -41,7 +79,7 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
     detectedHeaders,
     suggestedMapping,
   } = pulseState;
-  
+
   // Local state for file handling
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [feeBreakdown, setFeeBreakdown] = useState<FeeBreakdown[]>([]);
@@ -49,36 +87,39 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
   const handleFileUpload = async (file: File) => {
     updateState({ isLoading: true });
     setPendingFile(file);
-    
+
     try {
       const csvContent = await file.text();
-      const lines = csvContent.split('\n').filter(line => line.trim());
+      const lines = csvContent.split("\n").filter((line) => line.trim());
       if (lines.length === 0) throw new Error("Empty CSV file");
-      
+
       // Extract headers from first line
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const headers = lines[0]
+        .split(",")
+        .map((h) => h.trim().replace(/"/g, ""));
       updateState({ detectedHeaders: headers });
-      
+
       // Get suggested mapping by analyzing first few rows
-      const sampleData = lines.slice(0, 3).map(line => {
-        const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+      const sampleData = lines.slice(0, 3).map((line) => {
+        const values = line.split(",").map((v) => v.trim().replace(/"/g, ""));
         const row: any = {};
         headers.forEach((header, index) => {
-          row[header] = values[index] || '';
+          row[header] = values[index] || "";
         });
         return row;
       });
-      
+
       // Auto-detect column mapping
       const mapping = detectColumns(sampleData[0]);
-      updateState({ 
+      updateState({
         suggestedMapping: mapping,
-        showColumnMapper: true 
+        showColumnMapper: true,
       });
     } catch (error) {
       toast({
         title: "Upload failed",
-        description: "Failed to analyze CSV file. Please check the format and try again.",
+        description:
+          "Failed to analyze CSV file. Please check the format and try again.",
         variant: "destructive",
       });
       setPendingFile(null);
@@ -89,16 +130,16 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
 
   const handleMappingConfirm = async (mapping: ColumnMapping) => {
     if (!pendingFile) return;
-    
-    updateState({ 
+
+    updateState({
       isLoading: true,
-      showColumnMapper: false 
+      showColumnMapper: false,
     });
-    
+
     try {
       const csvContent = await pendingFile.text();
       const result: CSVParseResult = await parseCSV(csvContent, mapping);
-      
+
       if (result.errors.length > 0) {
         toast({
           title: "CSV parsing warnings",
@@ -106,13 +147,14 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
           variant: "destructive",
         });
       } else {
-        const formatType = (mapping.description && mapping.amount) ? 'transaction' : 'summary';
+        const formatType =
+          mapping.description && mapping.amount ? "transaction" : "summary";
         toast({
           title: "CSV uploaded successfully",
           description: `Processed ${result.data.length} ${formatType} rows of payout data.`,
         });
       }
-      
+
       setCsvData(result.data);
       generateFeeBreakdown(result.data);
       onDataChange?.(result.data);
@@ -139,7 +181,7 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
 
   // Helper function for column detection (moved from utils)
   const detectColumns = (sampleRow: any): ColumnMapping => {
-    const headers = Object.keys(sampleRow).map(h => h.toLowerCase());
+    const headers = Object.keys(sampleRow).map((h) => h.toLowerCase());
     const mapping: ColumnMapping = {};
 
     const patterns = {
@@ -157,9 +199,9 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
       amount: /^(amount|value|sum|total)$/i,
     };
 
-    Object.keys(sampleRow).forEach(header => {
+    Object.keys(sampleRow).forEach((header) => {
       const lowerHeader = header.toLowerCase();
-      
+
       for (const [field, pattern] of Object.entries(patterns)) {
         if (pattern.test(lowerHeader)) {
           mapping[field as keyof ColumnMapping] = header;
@@ -172,23 +214,26 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
   };
 
   const generateFeeBreakdown = (data: ParsedPayoutData[]) => {
-    const totals = data.reduce((acc, row) => ({
-      grossRobux: acc.grossRobux + row.grossRobux,
-      marketplaceFee: acc.marketplaceFee + row.marketplaceFee,
-      adSpend: acc.adSpend + row.adSpend,
-      groupSplits: acc.groupSplits + row.groupSplits,
-      affiliatePayouts: acc.affiliatePayouts + row.affiliatePayouts,
-      refunds: acc.refunds + row.refunds,
-      otherCosts: acc.otherCosts + row.otherCosts,
-    }), {
-      grossRobux: 0,
-      marketplaceFee: 0,
-      adSpend: 0,
-      groupSplits: 0,
-      affiliatePayouts: 0,
-      refunds: 0,
-      otherCosts: 0,
-    });
+    const totals = data.reduce(
+      (acc, row) => ({
+        grossRobux: acc.grossRobux + row.grossRobux,
+        marketplaceFee: acc.marketplaceFee + row.marketplaceFee,
+        adSpend: acc.adSpend + row.adSpend,
+        groupSplits: acc.groupSplits + row.groupSplits,
+        affiliatePayouts: acc.affiliatePayouts + row.affiliatePayouts,
+        refunds: acc.refunds + row.refunds,
+        otherCosts: acc.otherCosts + row.otherCosts,
+      }),
+      {
+        grossRobux: 0,
+        marketplaceFee: 0,
+        adSpend: 0,
+        groupSplits: 0,
+        affiliatePayouts: 0,
+        refunds: 0,
+        otherCosts: 0,
+      }
+    );
 
     const breakdown: FeeBreakdown[] = [
       {
@@ -227,7 +272,7 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
         totalUSD: totals.otherCosts * 0.0035,
         percentage: (totals.otherCosts / totals.grossRobux) * 100,
       },
-    ].filter(item => item.totalRobux > 0);
+    ].filter((item) => item.totalRobux > 0);
 
     setFeeBreakdown(breakdown);
   };
@@ -235,34 +280,39 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
   const getFilteredData = () => {
     const currentData = getCsvData();
     if (!currentData.length) return [];
-    
+
     let filtered = [...currentData];
-    
+
     // Apply date range filter
     if (dateRange !== "all") {
       const days = dateRange === "30d" ? 30 : 90;
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
-      
-      filtered = filtered.filter(item => new Date(item.date) >= cutoffDate);
+
+      filtered = filtered.filter((item) => new Date(item.date) >= cutoffDate);
     }
-    
+
     return filtered;
   };
 
   const getChartData = () => {
     const filtered = getFilteredData();
-    return filtered.map(item => ({
+    return filtered.map((item) => ({
       date: new Date(item.date).toLocaleDateString(),
-      [viewMode === "robux" ? "netRobux" : "netUSD"]: viewMode === "robux" ? item.netRobux : item.usdValue,
-      [viewMode === "robux" ? "grossRobux" : "grossUSD"]: viewMode === "robux" ? item.grossRobux : item.grossRobux * 0.0035,
+      [viewMode === "robux" ? "netRobux" : "netUSD"]:
+        viewMode === "robux" ? item.netRobux : item.usdValue,
+      [viewMode === "robux" ? "grossRobux" : "grossUSD"]:
+        viewMode === "robux" ? item.grossRobux : item.grossRobux * 0.0035,
     }));
   };
 
   const handleExportData = () => {
     const filtered = getFilteredData();
     if (filtered.length > 0) {
-      exportToCSV(filtered, `buxtax-payout-data-${new Date().toISOString().split('T')[0]}.csv`);
+      exportToCSV(
+        filtered,
+        `buxtax-payout-data-${new Date().toISOString().split("T")[0]}.csv`
+      );
       toast({
         title: "Data exported",
         description: "CSV file has been downloaded successfully.",
@@ -272,7 +322,11 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
 
   const getTotalEarnings = () => {
     const filtered = getFilteredData();
-    return filtered.reduce((sum, item) => sum + (viewMode === "robux" ? item.netRobux : item.usdValue), 0);
+    return filtered.reduce(
+      (sum, item) =>
+        sum + (viewMode === "robux" ? item.netRobux : item.usdValue),
+      0
+    );
   };
 
   const getEffectiveTakeRate = () => {
@@ -285,19 +339,19 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
   // Show column mapper if needed
   if (showColumnMapper) {
     return (
-        <CSVColumnMapper
-          csvHeaders={detectedHeaders}
-          suggestedMapping={suggestedMapping}
-          onMappingConfirm={handleMappingConfirm}
-          onCancel={handleMappingCancel}
-        />
+      <CSVColumnMapper
+        csvHeaders={detectedHeaders}
+        suggestedMapping={suggestedMapping}
+        onMappingConfirm={handleMappingConfirm}
+        onCancel={handleMappingCancel}
+      />
     );
   }
 
   if (getCsvData().length === 0) {
     return (
-      <BuxCard 
-        title="Payout Pulse" 
+      <BuxCard
+        title="Payout Pulse"
         icon={TrendingUp}
         variant="detailed"
         size="lg"
@@ -322,10 +376,17 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
     <div className="space-y-6">
       {/* Summary Cards Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <BuxCard title="Total Earnings" icon={TrendingUp} variant="dashboard" size="sm">
+        <BuxCard
+          title="Total Earnings"
+          icon={TrendingUp}
+          variant="dashboard"
+          size="sm"
+        >
           <div className="text-center">
             <div className="text-3xl font-bold text-primary mb-2">
-              {viewMode === "robux" ? formatRobux(totalEarnings) : formatCurrency(totalEarnings)}
+              {viewMode === "robux"
+                ? formatRobux(totalEarnings)
+                : formatCurrency(totalEarnings)}
             </div>
             <p className="text-sm text-muted-foreground">
               {dateRange === "all" ? "All time" : `Last ${dateRange}`}
@@ -336,28 +397,34 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
           </div>
         </BuxCard>
 
-        <BuxCard title="Effective Take Rate" icon={Calendar} variant="dashboard" size="sm">
+        <BuxCard
+          title="Effective Take Rate"
+          icon={Calendar}
+          variant="dashboard"
+          size="sm"
+        >
           <div className="text-center">
             <div className="text-3xl font-bold text-destructive mb-2">
               {effectiveTakeRate.toFixed(1)}%
             </div>
-            <p className="text-sm text-muted-foreground">
-              Platform + costs
-            </p>
+            <p className="text-sm text-muted-foreground">Platform + costs</p>
             <div className="mt-3 text-xs text-destructive/80 bg-destructive/10 rounded-full px-3 py-1 inline-block">
               Cost Rate
             </div>
           </div>
         </BuxCard>
 
-        <BuxCard title="Data Points" icon={Upload} variant="dashboard" size="sm">
+        <BuxCard
+          title="Data Points"
+          icon={Upload}
+          variant="dashboard"
+          size="sm"
+        >
           <div className="text-center">
             <div className="text-3xl font-bold mb-2">
               {getFilteredData().length}
             </div>
-            <p className="text-sm text-muted-foreground">
-              Payout records
-            </p>
+            <p className="text-sm text-muted-foreground">Payout records</p>
             <div className="mt-3 text-xs text-muted-foreground bg-muted/50 rounded-full px-3 py-1 inline-block">
               Data Records
             </div>
@@ -368,14 +435,24 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
       {/* Controls */}
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex gap-4">
-          <Tabs value={viewMode} onValueChange={(value) => updateState({ viewMode: value as "robux" | "usd" })}>
+          <Tabs
+            value={viewMode}
+            onValueChange={(value) =>
+              updateState({ viewMode: value as "robux" | "usd" })
+            }
+          >
             <TabsList>
               <TabsTrigger value="usd">USD View</TabsTrigger>
               <TabsTrigger value="robux">Robux View</TabsTrigger>
             </TabsList>
           </Tabs>
 
-          <Select value={dateRange} onValueChange={(value) => updateState({ dateRange: value as "all" | "30d" | "90d" })}>
+          <Select
+            value={dateRange}
+            onValueChange={(value) =>
+              updateState({ dateRange: value as "all" | "30d" | "90d" })
+            }
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -388,7 +465,12 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportData} className="gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportData}
+            className="gap-2"
+          >
             <Download className="h-4 w-4" />
             Export CSV
           </Button>
@@ -396,8 +478,8 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
       </div>
 
       {/* Chart */}
-      <BuxCard 
-        title="Earnings Over Time" 
+      <BuxCard
+        title="Earnings Over Time"
         icon={TrendingUp}
         variant="chart"
         size="xl"
@@ -409,40 +491,53 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
       >
         <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tick={{ fontSize: 12 }}
                 tickLine={{ strokeOpacity: 0.3 }}
                 axisLine={{ strokeOpacity: 0.3 }}
               />
-              <YAxis 
+              <YAxis
                 tick={{ fontSize: 12 }}
                 tickLine={{ strokeOpacity: 0.3 }}
                 axisLine={{ strokeOpacity: 0.3 }}
-                tickFormatter={(value) => viewMode === "robux" ? `${(value / 1000).toFixed(0)}k` : `$${value.toFixed(0)}`}
+                tickFormatter={(value) =>
+                  viewMode === "robux"
+                    ? `${(value / 1000).toFixed(0)}k`
+                    : `$${value.toFixed(0)}`
+                }
               />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px hsl(var(--foreground) / 0.1)',
+                  backgroundColor: "hsl(var(--background))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px -1px hsl(var(--foreground) / 0.1)",
                 }}
                 formatter={(value: number) => [
-                  viewMode === "robux" ? formatRobux(value) : formatCurrency(value),
-                  viewMode === "robux" ? "Net Robux" : "Net USD"
+                  viewMode === "robux"
+                    ? formatRobux(value)
+                    : formatCurrency(value),
+                  viewMode === "robux" ? "Net Robux" : "Net USD",
                 ]}
-                labelStyle={{ color: 'hsl(var(--foreground))' }}
+                labelStyle={{ color: "hsl(var(--foreground))" }}
               />
-              <Line 
-                type="monotone" 
+              <Line
+                type="monotone"
                 dataKey={viewMode === "robux" ? "netRobux" : "netUSD"}
-                stroke="hsl(var(--primary))" 
+                stroke="hsl(var(--primary))"
                 strokeWidth={3}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 5 }}
-                activeDot={{ r: 7, strokeWidth: 0, fill: 'hsl(var(--primary-glow))' }}
+                dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
+                activeDot={{
+                  r: 7,
+                  strokeWidth: 0,
+                  fill: "hsl(var(--primary-glow))",
+                }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -450,23 +545,34 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
       </BuxCard>
 
       {/* Fee Breakdown */}
-      <BuxCard 
-        title="Fee Breakdown" 
+      <BuxCard
+        title="Fee Breakdown"
         icon={Filter}
         variant="detailed"
         size="lg"
         shareable
+        userType={userType}
+        cardType="fee"
+        dataSourceId="buxtax-card-fee-breakdown"
         shareData={{
           netEarnings: totalEarnings,
           effectiveTakeRate: effectiveTakeRate,
         }}
       >
-        <EnhancedTable 
-          exportable 
+        <EnhancedTable
+          exportable
           onExport={() => {
-            const csvContent = "data:text/csv;charset=utf-8," 
-              + "Category,Robux,USD,Percentage\n"
-              + feeBreakdown.map(fee => `${fee.category},${fee.totalRobux},${fee.totalUSD.toFixed(2)},${fee.percentage.toFixed(1)}%`).join("\n");
+            const csvContent =
+              "data:text/csv;charset=utf-8," +
+              "Category,Robux,USD,Percentage\n" +
+              feeBreakdown
+                .map(
+                  (fee) =>
+                    `${fee.category},${fee.totalRobux},${fee.totalUSD.toFixed(
+                      2
+                    )},${fee.percentage.toFixed(1)}%`
+                )
+                .join("\n");
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -481,13 +587,20 @@ const PayoutPulse = memo(function PayoutPulse({ userType, onDataChange }: Payout
               <TableHead className="font-semibold">Category</TableHead>
               <TableHead className="text-right font-semibold">Robux</TableHead>
               <TableHead className="text-right font-semibold">USD</TableHead>
-              <TableHead className="text-right font-semibold">% of Gross</TableHead>
+              <TableHead className="text-right font-semibold">
+                % of Gross
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {feeBreakdown.map((fee, index) => (
-              <TableRow key={index} className="hover:bg-muted/30 transition-colors">
-                <TableCell className="font-medium py-3">{fee.category}</TableCell>
+              <TableRow
+                key={index}
+                className="hover:bg-muted/30 transition-colors"
+              >
+                <TableCell className="font-medium py-3">
+                  {fee.category}
+                </TableCell>
                 <TableCell className="text-right text-destructive font-mono py-3">
                   -{formatRobux(fee.totalRobux)}
                 </TableCell>

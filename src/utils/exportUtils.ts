@@ -7,6 +7,42 @@ export interface ExportOptions {
   addWatermark?: boolean;
 }
 
+// Helper function to resolve CSS custom properties to actual color values
+function resolveBackgroundColor(): string {
+  try {
+    // Try to get the computed background color from the document body or html element
+    const computedStyle = getComputedStyle(document.documentElement);
+    const bgColor = computedStyle.getPropertyValue("--background").trim();
+
+    if (bgColor) {
+      // If we have a custom property value, try to resolve it
+      if (
+        bgColor.startsWith("hsl(") ||
+        bgColor.startsWith("rgb(") ||
+        bgColor.startsWith("#")
+      ) {
+        return bgColor;
+      }
+      // Handle space-separated HSL values like "0 0% 100%"
+      if (bgColor.match(/^\d+\s+\d+%\s+\d+%$/)) {
+        return `hsl(${bgColor})`;
+      }
+    }
+
+    // Fallback: check if we're in dark mode by looking at common indicators
+    const isDarkMode =
+      document.documentElement.classList.contains("dark") ||
+      document.body.classList.contains("dark") ||
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    // Return appropriate background color
+    return isDarkMode ? "#0a0a0a" : "#ffffff";
+  } catch (error) {
+    console.warn("Failed to resolve background color, using default:", error);
+    return "#ffffff"; // Safe fallback
+  }
+}
+
 export async function exportCard(
   elementId: string,
   options: ExportOptions = { format: "png" }
@@ -15,16 +51,28 @@ export async function exportCard(
 
   // Fallback strategy: try alternative element IDs if primary not found
   if (!element) {
+    console.warn(
+      `Element with ID "${elementId}" not found. Trying fallback IDs...`
+    );
     const fallbackIds = ["main-content", "root"];
     for (const fallbackId of fallbackIds) {
       element = document.getElementById(fallbackId);
-      if (element) break;
+      if (element) {
+        console.log(`Found fallback element with ID: ${fallbackId}`);
+        break;
+      }
     }
   }
 
   if (!element) {
+    // Log all elements with IDs containing "buxtax" for debugging
+    console.error('Available elements with "buxtax" in ID:');
+    document.querySelectorAll('[id*="buxtax"]').forEach((el) => {
+      console.log(`- ${el.id}`);
+    });
+
     throw new Error(
-      `Element with ID "${elementId}" not found. Also tried fallback IDs: main-content, root`
+      `Element with ID "${elementId}" not found. Also tried fallback IDs: main-content, root. Check console for available elements.`
     );
   }
 
@@ -35,6 +83,10 @@ export async function exportCard(
       height: element.offsetHeight,
     });
 
+    // Resolve background color before rendering
+    const backgroundColor = resolveBackgroundColor();
+    console.log("Resolved background color:", backgroundColor);
+
     // Add export class for styling during capture
     element.classList.add("exporting");
 
@@ -42,11 +94,11 @@ export async function exportCard(
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const canvas = await html2canvas(element, {
-      backgroundColor: "hsl(var(--background))",
+      backgroundColor: backgroundColor,
       scale: options.quality || 2,
       useCORS: true,
       allowTaint: true,
-      foreignObjectRendering: true,
+      foreignObjectRendering: false,
       logging: false,
       width: element.offsetWidth,
       height: element.offsetHeight,
@@ -54,11 +106,42 @@ export async function exportCard(
       scrollX: 0,
       scrollY: 0,
       onclone: (clonedDoc) => {
-        // Ensure styles are preserved in the clone
-        const clonedElement = clonedDoc.getElementById(element.id);
-        if (clonedElement) {
-          clonedElement.style.transform = "none";
-          clonedElement.style.position = "static";
+        try {
+          // Ensure styles are preserved in the clone and fix CSS custom properties
+          const clonedElement = clonedDoc.getElementById(element.id);
+          if (clonedElement) {
+            clonedElement.style.transform = "none";
+            clonedElement.style.position = "static";
+
+            // Fix any CSS custom properties in the cloned document
+            const allElements = clonedDoc.querySelectorAll("*");
+            allElements.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+
+              // Fix background colors with CSS custom properties
+              if (
+                htmlEl.style.backgroundColor &&
+                htmlEl.style.backgroundColor.includes("var(")
+              ) {
+                const computedStyle = getComputedStyle(htmlEl);
+                const resolvedBg = computedStyle.backgroundColor;
+                if (resolvedBg && resolvedBg !== "rgba(0, 0, 0, 0)") {
+                  htmlEl.style.backgroundColor = resolvedBg;
+                }
+              }
+
+              // Fix color properties with CSS custom properties
+              if (htmlEl.style.color && htmlEl.style.color.includes("var(")) {
+                const computedStyle = getComputedStyle(htmlEl);
+                const resolvedColor = computedStyle.color;
+                if (resolvedColor) {
+                  htmlEl.style.color = resolvedColor;
+                }
+              }
+            });
+          }
+        } catch (cloneError) {
+          console.warn("Error processing cloned document:", cloneError);
         }
       },
     });
@@ -80,6 +163,22 @@ export async function exportCard(
   } catch (error) {
     // Remove export class in case of error
     element.classList.remove("exporting");
+    console.error("html2canvas error details:", error);
+
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes("angle")) {
+        throw new Error(
+          "Export failed due to unsupported CSS properties. This may be caused by gradients or CSS custom properties that html2canvas cannot process."
+        );
+      } else if (error.message.includes("taint")) {
+        throw new Error(
+          "Export failed due to cross-origin image restrictions. Some images may not be accessible."
+        );
+      } else {
+        throw new Error(`Export failed: ${error.message}`);
+      }
+    }
     throw error;
   }
 }
@@ -91,7 +190,7 @@ function addBuxTaxWatermark(canvas: HTMLCanvasElement): void {
   // Add subtle BuxTax watermark in bottom right
   ctx.save();
   ctx.globalAlpha = 0.7;
-  ctx.fillStyle = "hsl(var(--muted-foreground))"; // Will need runtime evaluation
+  ctx.fillStyle = "#6b7280"; // Use a proper color value instead of CSS custom properties
   ctx.font = "12px Inter, system-ui, sans-serif";
   ctx.textAlign = "right";
 

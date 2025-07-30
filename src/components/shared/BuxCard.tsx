@@ -10,9 +10,10 @@ interface BuxCardProps {
   children: ReactNode;
   shareable?: boolean;
   dataSourceId?: string;
-  variant?: 'summary' | 'detailed' | 'chart' | 'dashboard';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  userType?: 'gameDev' | 'ugcCreator';
+  variant?: "summary" | "detailed" | "chart" | "dashboard";
+  size?: "sm" | "md" | "lg" | "xl";
+  userType?: "gameDev" | "ugcCreator";
+  cardType?: "profit" | "goal" | "fee";
   shareData?: {
     netEarnings?: number;
     effectiveTakeRate?: number;
@@ -21,33 +22,35 @@ interface BuxCardProps {
   };
 }
 
-export function BuxCard({ 
-  title, 
-  icon: Icon, 
-  children, 
+export function BuxCard({
+  title,
+  icon: Icon,
+  children,
   shareable = true,
   dataSourceId,
-  variant = 'summary',
-  size = 'md',
+  variant = "summary",
+  size = "md",
   userType,
-  shareData
+  cardType,
+  shareData,
 }: BuxCardProps) {
-  const cardId = dataSourceId || `buxtax-card-${title.toLowerCase().replace(/\s+/g, '-')}`;
-  
+  const cardId =
+    dataSourceId || `buxtax-card-${title.toLowerCase().replace(/\s+/g, "-")}`;
+
   const getUserTypeIcon = () => {
-    if (userType === 'gameDev') return '🎮';
-    if (userType === 'ugcCreator') return '🎨';
-    return '';
+    if (userType === "gameDev") return "🎮";
+    if (userType === "ugcCreator") return "🎨";
+    return "";
   };
 
   const getUserTypeTheme = () => {
-    if (userType === 'gameDev') return 'theme-gamedev';
-    if (userType === 'ugcCreator') return 'theme-ugc';
-    return '';
+    if (userType === "gameDev") return "theme-gamedev";
+    if (userType === "ugcCreator") return "theme-ugc";
+    return "";
   };
 
   return (
-    <Card 
+    <Card
       id={cardId}
       variant={variant}
       size={size}
@@ -65,40 +68,44 @@ export function BuxCard({
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-card-foreground">{title}</h3>
+              <h3 className="text-lg font-semibold text-card-foreground">
+                {title}
+              </h3>
               {userType && (
                 <p className="text-xs text-muted-foreground">
-                  {userType === 'gameDev' ? 'Game Developer' : 'UGC Creator'}
+                  {userType === "gameDev" ? "Game Developer" : "UGC Creator"}
                 </p>
               )}
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {/* Mini BuxTax logo */}
             <div className="text-xs font-bold text-muted-foreground">
               BuxTax
             </div>
-            
-            {shareable && (
-              <ShareMenu 
+
+            {shareable && userType && cardType && (
+              <ShareMenu
                 dataSourceId={dataSourceId}
                 shareData={shareData}
                 cardTitle={title}
+                cardType={cardType}
+                userType={userType}
               />
             )}
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4 mobile-card-padding pt-0">
         {children}
-        
+
         {/* Footer with timestamp */}
         <div className="pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            Rates updated {FEE_CONSTANTS.LAST_UPDATED} •{' '}
-            <a 
+            Rates updated {FEE_CONSTANTS.LAST_UPDATED} •{" "}
+            <a
               href={FEE_CONSTANTS.SOURCE_URL}
               target="_blank"
               rel="noopener noreferrer"
