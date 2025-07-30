@@ -169,18 +169,6 @@ export function ShareMenu({ dataSourceId, shareData, cardTitle }: ShareMenuProps
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={handleCopyCaption}>
-          <Copy className="mr-2 h-4 w-4" />
-          Copy Caption
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem onClick={handleCopyLink}>
-          <Copy className="mr-2 h-4 w-4" />
-          Copy Link
-        </DropdownMenuItem>
-        
-        <DropdownMenuSeparator />
-        
         <DropdownMenuItem onClick={() => handleSocialShare('twitter')}>
           <ExternalLink className="mr-2 h-4 w-4" />
           Share on Twitter
