@@ -11,10 +11,19 @@ export async function exportCard(
   elementId: string, 
   options: ExportOptions = { format: 'png' }
 ): Promise<void> {
-  const element = document.getElementById(elementId);
+  let element = document.getElementById(elementId);
+  
+  // Fallback strategy: try alternative element IDs if primary not found
+  if (!element) {
+    const fallbackIds = ['main-content', 'root'];
+    for (const fallbackId of fallbackIds) {
+      element = document.getElementById(fallbackId);
+      if (element) break;
+    }
+  }
   
   if (!element) {
-    throw new Error(`Element with ID "${elementId}" not found`);
+    throw new Error(`Element with ID "${elementId}" not found. Also tried fallback IDs: main-content, root`);
   }
 
   try {
@@ -30,6 +39,9 @@ export async function exportCard(
       logging: false,
       width: element.offsetWidth,
       height: element.offsetHeight,
+      removeContainer: true,
+      scrollX: 0,
+      scrollY: 0,
     });
 
     // Remove export class

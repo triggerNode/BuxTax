@@ -54,7 +54,7 @@ function IndexContent() {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-background to-muted/20 py-8 ${userType === 'gameDev' ? 'theme-gamedev' : 'theme-ugc'} flex flex-col`}>
-      <div className="dashboard-container flex-1">
+      <div id="main-content" className="dashboard-container flex-1">
         <BuxTaxHeader 
           userType={userType} 
           onUserTypeChange={handleUserTypeChange}
