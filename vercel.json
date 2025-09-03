@@ -22,6 +22,12 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/Brand%20Asset/BuxTax%20svg%20Logo.svg",
