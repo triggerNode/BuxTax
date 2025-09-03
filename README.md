@@ -1,4 +1,6 @@
-<img width="48" height="48" alt="icon48" src="https://github.com/user-attachments/assets/252a23a8-3266-4d21-b655-f246f1a748ec" /> **BuxTax**
+<img width="48" height="48" alt="icon48" src="https://github.com/user-attachments/assets/252a23a8-3266-4d21-b655-f246f1a748ec" /> 
+
+**BuxTax**
 
 
 Reveal the true USD value of your Roblox work.
