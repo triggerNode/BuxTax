@@ -86,7 +86,7 @@ export default function SignIn() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
             <img
-              src="/Brand Asset/BuxTax svg Logo.svg"
+              src="/brand/buxtax-logo.svg"
               alt="BuxTax Logo"
               className="h-16 w-auto mx-auto"
             />

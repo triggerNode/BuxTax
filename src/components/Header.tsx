@@ -21,7 +21,7 @@ export const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <img
-              src="/Brand Asset/BuxTax svg Logo.svg"
+              src="/brand/buxtax-logo.svg"
               alt="BuxTax Logo"
               className="h-8 w-auto"
             />

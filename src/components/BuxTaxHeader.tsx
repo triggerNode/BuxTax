@@ -34,7 +34,7 @@ export function BuxTaxHeader({
         {/* Top row: BuxTax wordmark and primary actions */}
         <div className="relative flex items-center justify-center mb-2">
           <img
-            src="/Brand Asset/BuxTax svg Logo.svg"
+            src="/brand/buxtax-logo.svg"
             alt="BuxTax Logo"
             className="h-16 w-auto"
           />

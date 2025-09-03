@@ -32,7 +32,7 @@ export default function Privacy() {
           </Button>
           <div className="flex justify-center mb-6">
             <img
-              src="/Brand Asset/BuxTax svg Logo.svg"
+              src="/brand/buxtax-logo.svg"
               alt="BuxTax Logo"
               className="h-16 w-auto"
             />

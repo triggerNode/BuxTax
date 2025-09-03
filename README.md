@@ -1,77 +1,178 @@
-# Welcome to your Lovable project
+# BuxTax
 
-## Project info
+Reveal the true USD value of your Roblox work.
 
-**URL**: https://lovable.dev/projects/2f2280b3-9d0b-4e97-9eca-01abc0be1e56
+## Why BuxTax exists
 
-## How can I edit this code?
+Roblox creators often guess their real earnings. Marketplace fees, group splits, ad spend, affiliate payouts, refunds, and the DevEx conversion all blur the truth. You see Robux totals. You need to know your take home in USD. That clarity guides pricing, ad budgets, and roadmap decisions.
 
-There are several ways of editing your application.
+BuxTax exists to make the money side legible. It turns messy Robux inputs into clean USD insights you can act on.
 
-**Use Lovable**
+## How BuxTax delivers clarity
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2f2280b3-9d0b-4e97-9eca-01abc0be1e56) and start prompting.
+BuxTax focuses on three moments where creators need answers.
 
-Changes made via Lovable will be committed automatically to this repo.
+1. Profit Calculator
 
-**Use your preferred IDE**
+- Enter gross Robux and optional costs like ad spend, group splits, affiliate payouts, refunds, and other costs.
+- See your net Robux, your USD payout, and your effective take rate.
+- Choose your creator type. Game developers use a 30% platform fee. UGC creators use a 70% platform fee.
+- Based on the current DevEx rate of 350 Robux per 1 USD.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. Goal Seeker
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Set a target USD payout and a deadline.
+- Get the required gross Robux to hit that goal, factoring in expected costs and marketplace fees.
+- See the exact reverse math so you can plan your path with confidence.
 
-Follow these steps:
+3. Payout Pulse
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- Upload your CSV payout exports.
+- Track net earnings over time in Robux or USD. Filter by 30 or 90 days.
+- Break down the impact of key cost categories. Export a cleaned CSV.
+- Map columns with a guided mapper so your data lines up.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+On top of that you can share visuals. Download clean PNG or PDF snapshots. Generate captions for social posts. Turn insights into momentum.
 
-# Step 3: Install the necessary dependencies.
-npm i
+## What you get
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+- Transparent math: 350 Robux equals 1 USD DevEx, 30% platform fee for game developers, 70% for UGC creators. Values live in `src/lib/fees.ts` and can be updated.
+- Two creator modes: Game Developer and UGC Creator. Each mode uses the correct fee structure.
+- Live insights: Effective take rate, USD payout, net Robux, and goal math update as you type.
+- CSV analytics: Time series charts, fee breakdown tables, date range filters, and CSV export.
+- Social sharing and export: PNG and PDF exports with on brand visuals.
+- Modern UI: Built with React, Vite, TypeScript, Tailwind, and shadcn UI.
+- Auth and paywall: Supabase Auth with branded emails, Stripe checkout, and webhook driven access.
+
+## Screenshots
+
+![Profit Calculator](public/screenshots/Profit%20Calculator.png)
+
+![Goals](public/screenshots/Goals.png)
+
+![Payout Pulse](public/screenshots/Payout%20Pulse.png)
+
+## Quick start
+
+1. Requirements
+
+- Node 18 or newer
+- npm 9 or newer
+
+2. Clone and install
+
+```bash
+git clone <your_repo_url>
+cd BuxTax
+npm install
+```
+
+3. Configure environment
+
+```bash
+cp env.template .env
+# Edit .env and set values for:
+# VITE_SUPABASE_URL
+# VITE_SUPABASE_ANON_KEY
+# VITE_STRIPE_LIFETIME_PAYMENT_LINK (optional if using payment link)
+# STRIPE_SECRET
+# STRIPE_WEBHOOK_SECRET
+# SUPABASE_SERVICE_ROLE
+```
+
+4. Run the app
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+5. Build for production
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run build
+```
 
-**Use GitHub Codespaces**
+## Configuration
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Environment variables used by the app. See `env.template` for the canonical list.
 
-## What technologies are used for this project?
+- VITE_SUPABASE_URL: Your Supabase project URL
+- VITE_SUPABASE_ANON_KEY: Supabase anonymous key
+- VITE_STRIPE_LIFETIME_PAYMENT_LINK: Optional Stripe Payment Link for lifetime plan
+- STRIPE_SECRET: Stripe secret key
+- STRIPE_WEBHOOK_SECRET: Stripe webhook signing secret
+- SUPABASE_SERVICE_ROLE: Supabase service role key for secure server logic
 
-This project is built with:
+Payments and auth
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Supabase Auth is used for sign in and user profiles. Email templates live in `supabase/templates`.
+- Stripe powers checkout and webhooks. Edge functions live in `supabase/functions`.
+- See the guides for end to end setup:
+  - [Quick Start](QUICK_START.md)
+  - [Deployment Guide](DEPLOYMENT_GUIDE.md)
+  - [Stripe Integration TODO](STRIPE_INTEGRATION_TODO.md)
 
-## How can I deploy this project?
+## Data and assumptions
 
-Simply open [Lovable](https://lovable.dev/projects/2f2280b3-9d0b-4e97-9eca-01abc0be1e56) and click on Share -> Publish.
+- DevEx conversion: 350 Robux equals 1 USD. Implemented as `DEVEX_RATE_USD_PER_ROBUX` in `src/lib/fees.ts`.
+- Platform fee: 30% for game developers, 70% for UGC creators.
+- Last update for these constants: 2025-01-28. Source: [Roblox Help Center](https://en.help.roblox.com/hc/en-us/articles/13061189551124).
+- Numbers can change. If rates update, edit `src/lib/fees.ts` and redeploy.
 
-## Can I connect a custom domain to my Lovable project?
+## Tech stack
 
-Yes, you can!
+- React + Vite + TypeScript
+- Tailwind CSS + shadcn UI
+- Supabase for Auth and database
+- Stripe for payments
+- Recharts for charts
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Project structure
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```
+src/
+  components/        # UI and feature components
+  pages/             # App pages and routes
+  contexts/          # App state providers
+  lib/fees.ts        # Fees, DevEx rate, and money math
+  utils/             # CSV parsing, sharing, export utilities
+supabase/
+  functions/         # Edge functions for checkout and webhooks
+  migrations/        # Database migrations
+public/              # Static assets and screenshots
+```
 
-## Branded Supabase Auth emails
+## Asset & Path Convention
 
-Branded Supabase Auth email templates live under `supabase/templates/` and are wired via `supabase/config.toml` for local development. For hosted Supabase, upload each HTML template in Dashboard → Authentication → Email Templates. The templates reference the app icon at `/icon48.png`.
+- All brand assets are in `public/brand/` and referenced with root-absolute paths:
+  - Logo: `/brand/buxtax-logo.svg`
+  - Favicon: `/brand/favicon.svg` (or `/brand/favicon.ico`)
+- Do not reference files with spaces or mixed case (e.g., `Brand Asset/BuxTax svg Logo.svg`).
+- On Linux (Vercel), paths are case-sensitive. If renaming on Windows/macOS, set:
+
+```bash
+git config core.ignorecase false
+```
+
+and use `git mv -f` to force case-only renames.
+
+## Deploy notes (Vercel)
+
+- Branch: `color-refactor` (current default)
+- Vercel auto-deploys on push.
+- If static assets appear stale behind Cloudflare, purge cache for the changed URLs (e.g., `/brand/buxtax-logo.svg`).
+
+## DNS / Domains
+
+- Production domains: `bux.tax`, `www.bux.tax` → Vercel.
+- APEX: `A 216.198.79.1` (or Vercel-recommended IP if they update).
+- `www` CNAME to the Vercel target shown in Vercel → Project → Settings → Domains.
+- Behind Cloudflare: keep Cloudflare DNS records aligned with Vercel’s “Valid configuration”.
+
+## Contributing
+
+Issues and pull requests are welcome. Share your use case and the decision you want clarity on. Clear problems lead to clear improvements.
+
+## A note to creators
+
+You deserve to see the real value of your work. Use BuxTax to understand your earnings, set better goals, and make smarter bets. If it saves you time or money, tell another creator.
