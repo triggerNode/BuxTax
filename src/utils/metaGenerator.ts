@@ -11,8 +11,8 @@ export interface ShareData {
   feePercentage?: number;
 }
 
-export type CardType = 'profit' | 'goal' | 'fee';
-export type UserType = 'gameDev' | 'ugcCreator';
+export type CardType = "profit" | "goal" | "fee";
+export type UserType = "gameDev" | "ugcCreator";
 
 /**
  * Generates a social media share URL for various platforms.
@@ -22,23 +22,33 @@ export type UserType = 'gameDev' | 'ugcCreator';
  * @returns The share URL for the specified platform.
  */
 export function generateSocialShareUrl(
-  platform: 'twitter' | 'reddit' | 'linkedin' | 'facebook',
+  platform: "twitter" | "reddit" | "linkedin" | "facebook",
   cardTitle: string,
   caption: string
 ): string {
   const pageUrl = window.location.href; // Current page URL
 
   switch (platform) {
-    case 'twitter':
-      return `https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}&url=${encodeURIComponent(pageUrl)}&hashtags=BuxTax,RobloxDev`;
-    case 'reddit':
-      return `https://reddit.com/submit?title=${encodeURIComponent(caption)}&url=${encodeURIComponent(pageUrl)}`;
-    case 'linkedin':
-      return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(cardTitle)}&summary=${encodeURIComponent(caption)}`;
-    case 'facebook':
-      return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(caption)}`;
+    case "twitter":
+      return `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        caption
+      )}&url=${encodeURIComponent(pageUrl)}&hashtags=BuxTax,RobloxDev`;
+    case "reddit":
+      return `https://reddit.com/submit?title=${encodeURIComponent(
+        caption
+      )}&url=${encodeURIComponent(pageUrl)}`;
+    case "linkedin":
+      return `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+        pageUrl
+      )}&title=${encodeURIComponent(cardTitle)}&summary=${encodeURIComponent(
+        caption
+      )}`;
+    case "facebook":
+      return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        pageUrl
+      )}&quote=${encodeURIComponent(caption)}`;
     default:
-      return '';
+      return "";
   }
 }
 
@@ -53,6 +63,7 @@ export function generateSocialShareUrl(
 export function generateSocialCaption(
   shareMenuData: {
     netEarnings?: number;
+    netRobux?: number;
     effectiveTakeRate?: number;
     nextGoal?: number;
     goalDeadline?: string;
@@ -61,49 +72,63 @@ export function generateSocialCaption(
   userType: UserType,
   cardTitle: string
 ): string {
+  // Standardize Profit Calculator caption per spec
+  if (cardType === "profit") {
+    const usd = Number(shareMenuData?.netEarnings || 0);
+    const net = Number(shareMenuData?.netRobux || 0);
+    const etr = Number(shareMenuData?.effectiveTakeRate || 0);
+    const etrPct = etr > 1 ? etr : etr * 100;
+
+    const usdStr = usd.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const netStr = Math.round(net).toLocaleString();
+    const etrStr = etrPct.toFixed(1);
+
+    return `Profit Calculator — USD: $${usdStr}, Net: ${netStr} R$, ETR: ${etrStr}% • Source: https://bux.tax`;
+  }
+
+  // Existing logic for other card types preserved
   const formatCurrency = (value?: number) => {
-    if (!value) return '$0.00';
+    if (!value) return "$0.00";
     return `$${value.toFixed(2)}`;
   };
 
   const formatPercentage = (value?: number) => {
-    if (!value) return '0%';
+    if (!value) return "0%";
     return `${(value * 100).toFixed(2)}%`;
   };
 
   const formatRobux = (value?: number) => {
-    if (!value) return 'R$0';
+    if (!value) return "R$0";
     return `R$${Math.round(value).toLocaleString()}`;
   };
 
   let caption = `📊 BuxTax ${cardTitle}\n\n`;
 
   switch (cardType) {
-    case 'profit':
-      if (shareMenuData.netEarnings !== undefined) {
-        caption += `💰 Net Earnings: ${formatCurrency(shareMenuData.netEarnings)}\n`;
-      }
-      if (shareMenuData.effectiveTakeRate !== undefined) {
-        caption += `📈 Effective Take Rate: ${formatPercentage(shareMenuData.effectiveTakeRate)}\n`;
-      }
-      break;
-    case 'goal':
+    case "goal":
       if (shareMenuData.nextGoal !== undefined) {
         caption += `🎯 Target: ${formatCurrency(shareMenuData.nextGoal)}\n`;
-        // Calculate approximate Robux requirement
-        const requiredRobux = shareMenuData.nextGoal * (userType === 'gameDev' ? 350 : 1000/3);
+        const requiredRobux =
+          shareMenuData.nextGoal * (userType === "gameDev" ? 350 : 1000 / 3);
         caption += `🪙 Required Robux: ${formatRobux(requiredRobux)}\n`;
       }
       if (shareMenuData.goalDeadline) {
         caption += `⏰ Deadline: ${shareMenuData.goalDeadline}\n`;
       }
       break;
-    case 'fee':
+    case "fee":
       if (shareMenuData.effectiveTakeRate !== undefined) {
-        caption += `💸 Effective Take Rate: ${formatPercentage(shareMenuData.effectiveTakeRate)}\n`;
+        caption += `💸 Effective Take Rate: ${formatPercentage(
+          shareMenuData.effectiveTakeRate
+        )}\n`;
       }
       if (shareMenuData.netEarnings !== undefined) {
-        caption += `💰 Net Earnings: ${formatCurrency(shareMenuData.netEarnings)}\n`;
+        caption += `💰 Net Earnings: ${formatCurrency(
+          shareMenuData.netEarnings
+        )}\n`;
       }
       break;
   }
@@ -118,7 +143,7 @@ export function generateSocialCaption(
  * @returns A data URL that can be shared.
  */
 export function canvasToDataURL(canvas: HTMLCanvasElement): string {
-  return canvas.toDataURL('image/png');
+  return canvas.toDataURL("image/png");
 }
 
 /**
@@ -126,8 +151,11 @@ export function canvasToDataURL(canvas: HTMLCanvasElement): string {
  * @param canvas The canvas element to download.
  * @param filename The filename for the download.
  */
-export function downloadCanvasAsImage(canvas: HTMLCanvasElement, filename: string): void {
-  const link = document.createElement('a');
+export function downloadCanvasAsImage(
+  canvas: HTMLCanvasElement,
+  filename: string
+): void {
+  const link = document.createElement("a");
   link.download = filename;
   link.href = canvasToDataURL(canvas);
   document.body.appendChild(link);

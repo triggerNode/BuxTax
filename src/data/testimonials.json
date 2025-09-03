@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Alex Chen",
+    "role": "Game Developer",
+    "content": "BuxTax saved me hours of manual calculations. I now know exactly what I'll earn after DevEx fees.",
+    "avatar": "AC"
+  },
+  {
+    "id": 2,
+    "name": "Sarah Johnson",
+    "role": "Roblox Creator",
+    "content": "Finally, a tool that gives me accurate conversion rates. The breakdown is super detailed and helpful.",
+    "avatar": "SJ"
+  },
+  {
+    "id": 3,
+    "name": "Mike Rodriguez",
+    "role": "UGC Creator",
+    "content": "I use BuxTax before every DevEx. It's become an essential part of my Roblox income planning.",
+    "avatar": "MR"
+  }
+]

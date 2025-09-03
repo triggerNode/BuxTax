@@ -1,11 +1,14 @@
-import { BuxTaxHeader } from "@/components/BuxTaxHeader";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 
 export default function Privacy() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { profile } = useProfile();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 py-8">
@@ -14,7 +17,14 @@ export default function Privacy() {
         <div className="mb-8">
           <Button
             variant="ghost"
-            onClick={() => navigate("/")}
+            onClick={() => {
+              if (!user) {
+                navigate("/signin");
+                return;
+              }
+              const hasActivePayment = profile?.payment_status === "active";
+              navigate(hasActivePayment ? "/app" : "/#pricing");
+            }}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

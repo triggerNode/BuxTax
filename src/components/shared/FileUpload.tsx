@@ -10,57 +10,66 @@ interface FileUploadProps {
   className?: string;
 }
 
-export function FileUpload({ 
-  onFileSelect, 
-  accept = ".csv", 
+export function FileUpload({
+  onFileSelect,
+  accept = ".csv",
   maxSize = 10,
-  className = ""
+  className = "",
 }: FileUploadProps) {
   const { toast } = useToast();
 
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const files = Array.from(e.dataTransfer.files);
-    const file = files[0];
-    
-    if (!file) return;
-    
-    // Validate file size
-    if (file.size > maxSize * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: `Please select a file smaller than ${maxSize}MB`,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Validate file type
-    if (accept && !file.name.toLowerCase().endsWith(accept.replace('.', ''))) {
-      toast({
-        title: "Invalid file type",
-        description: `Please select a ${accept} file`,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    onFileSelect(file);
-  }, [onFileSelect, accept, maxSize, toast]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const files = Array.from(e.dataTransfer.files);
+      const file = files[0];
+
+      if (!file) return;
+
+      // Validate file size
+      if (file.size > maxSize * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: `Please select a file smaller than ${maxSize}MB`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type
+      if (
+        accept &&
+        !file.name.toLowerCase().endsWith(accept.replace(".", ""))
+      ) {
+        toast({
+          title: "Invalid file type",
+          description: `Please select a ${accept} file`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      onFileSelect(file);
+    },
+    [onFileSelect, accept, maxSize, toast]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
 
-  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onFileSelect(file);
-    }
-  }, [onFileSelect]);
+  const handleFileInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        onFileSelect(file);
+      }
+    },
+    [onFileSelect]
+  );
 
   return (
     <div
@@ -73,7 +82,7 @@ export function FileUpload({
       <p className="text-muted-foreground mb-4">
         Drag and drop your file here, or click to browse
       </p>
-      
+
       <input
         type="file"
         accept={accept}
@@ -81,14 +90,14 @@ export function FileUpload({
         className="hidden"
         id="file-upload"
       />
-      
-      <Button variant="outline" asChild>
+
+      <Button variant="default" asChild>
         <label htmlFor="file-upload" className="cursor-pointer">
           <File className="w-4 h-4 mr-2" />
           Select File
         </label>
       </Button>
-      
+
       <div className="mt-4 space-y-1">
         <p className="text-xs text-muted-foreground">
           • Max file size: {maxSize}MB

@@ -1,3 +1,37 @@
+/* Local Brand Fonts */
+@font-face {
+  font-family: "Rounded Mplus 1c";
+  src: url("/Brand Asset/BuxTax Font/RoundedMplus1c-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Rounded Mplus 1c";
+  src: url("/Brand Asset/BuxTax Font/RoundedMplus1c-Medium.ttf")
+    format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Rounded Mplus 1c";
+  src: url("/Brand Asset/BuxTax Font/RoundedMplus1c-Bold.ttf")
+    format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Rounded Mplus 1c";
+  src: url("/Brand Asset/BuxTax Font/RoundedMplus1c-ExtraBold.ttf")
+    format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,130 +40,141 @@
 
 @layer base {
   :root {
-    --background: 60 25% 95%; /* Cream #FAFAED */
-    --foreground: 0 0% 0%; /* Black #000000 */
+    /* Brand palette (HSL components) */
+    /* If these already exist, keep them; we’re ensuring values match the Oishii guide */
+    --cream: 60 56.5% 95.5%; /* #FAFAED */
+    --royal: 237.8 87% 51.6%; /* #1820EF */
+    --cherry: 3.8 100% 62.9%; /* #FF4E42 */
+    --yellow: 42.7 100% 57.1%; /* #FFC024 */
+    --burgundy: 0 55% 33.1%; /* #832626 */
+    --black: 0 0% 0%; /* #000000 */
 
-    --card: 60 25% 95%; /* Cream #FAFAED */
-    --card-foreground: 0 0% 0%; /* Black #000000 */
-
-    --popover: 60 25% 95%; /* Cream #FAFAED */
-    --popover-foreground: 0 0% 0%; /* Black #000000 */
-
-    /* BuxTax Brand Colors */
-    --primary: 237 89% 52%; /* Royal Blue #1820EF */
-    --primary-foreground: 60 25% 95%; /* Cream #FAFAED */
+    /* Semantic mappings (ensure buttons pick up the guide) */
+    --background: var(--cream);
+    --foreground: 0 0% 10%;
+    --primary: var(--royal);
+    --primary-foreground: 0 0% 100%;
+    /* Opaque surface tokens per style guide */
+    --card: var(--cream);
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
     --primary-glow: 237 89% 60%; /* Lighter Royal Blue */
-    
+
     /* User Type Themes */
     --gamedev-primary: 237 89% 52%; /* Royal Blue theme for Game Devs */
     --gamedev-accent: 237 89% 52%;
     --gamedev-glow: 237 89% 60%;
-    
+
     --ugc-primary: 237 89% 52%; /* Royal Blue theme for UGC Creators */
     --ugc-accent: 237 89% 52%;
     --ugc-glow: 237 89% 60%;
 
-    --secondary: 60 25% 95%; /* Cream #FAFAED (ghost button fill) */
-    --secondary-foreground: 0 0% 0%; /* Black #000000 (text & border) */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 60 25% 95%; /* Cream #FAFAED */
-    --muted-foreground: 0 0% 0%; /* Black #000000 */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 237 89% 52%; /* Royal Blue #1820EF */
-    --accent-foreground: 60 25% 95%; /* Cream #FAFAED */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-    /* Action Colors */
-    --action: 8 100% 63%; /* Cherry Red #FF4E42 */
-    --action-foreground: 60 25% 95%; /* Cream #FAFAED (text on red) */
-    --action-hover: 8 100% 56%; /* darker red hover */
+    /* Action (CTA) — brand yellow with dark text & a darker hover */
+    --action: var(--yellow);
+    --action-foreground: 0 0% 7%;
+    /* Slightly darker yellow for hover (reduce L by ~5%) */
+    --action-hover: 42.7 100% 52%;
 
-    --destructive: 8 100% 63%; /* Cherry Red #FF4E42 (same as action) */
-    --destructive-foreground: 60 25% 95%; /* Cream #FAFAED */
+    /* Destructive => cherry red per guide */
+    --destructive: var(--cherry);
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 0%; /* Black #000000 */
-    --input: 0 0% 0%; /* Black #000000 */
-    --ring: 237 89% 52%; /* Royal Blue #1820EF */
+    /* Base surfaces */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    /* Focus outline color used by shadcn (ring-ring) — brand royal per style guide */
+    --ring: var(--royal);
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     /* Chart Colors */
     --chart-blue: 237 89% 52%; /* Royal Blue #1820EF */
-    --chart-purple: 8 100% 63%; /* Cherry Red #FF4E42 */
-    --chart-green: 48 100% 59%; /* Yellow #FFC024 */
-    --chart-orange: 360 68% 33%; /* Burgundy #832626 */
+    --chart-purple: 4 100% 63%; /* Cherry Red #FF4E42 */
+    --chart-green: 42 100% 57%; /* Yellow #FFC024 */
+    --chart-orange: 0 52% 27%; /* Burgundy #832626 */
 
     /* Additional Brand Colors */
-    --success: 48 100% 59%; /* Yellow #FFC024 */
+    --success: 42 100% 57%; /* Yellow #FFC024 */
     --success-foreground: 0 0% 0%; /* Black #000000 */
-    --burgundy-accent: 360 68% 33%; /* Burgundy #832626 */
-    --burgundy-foreground: 60 25% 95%; /* Cream #FAFAED */
+    --burgundy-accent: 0 52% 27%; /* Burgundy #832626 */
+    --burgundy-foreground: 56 52% 95%; /* Cream #FAFAED */
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-subtle: linear-gradient(
+      180deg,
+      hsl(var(--background)),
+      hsl(var(--muted))
+    );
 
     /* Shadows */
     --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.1);
-    --shadow-card: 0 1px 3px 0 hsl(var(--foreground) / 0.1), 0 1px 2px 0 hsl(var(--foreground) / 0.06);
+    --shadow-card: 0 1px 3px 0 hsl(var(--foreground) / 0.1),
+      0 1px 2px 0 hsl(var(--foreground) / 0.06);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --radius: 0.75rem;
-
-    --sidebar-background: 60 25% 95%; /* Cream #FAFAED */
-
-    --sidebar-foreground: 0 0% 0%; /* Black #000000 */
-
-    --sidebar-primary: 237 89% 52%; /* Royal Blue #1820EF */
-
-    --sidebar-primary-foreground: 60 25% 95%; /* Cream #FAFAED */
-
-    --sidebar-accent: 60 25% 95%; /* Cream #FAFAED */
-
-    --sidebar-accent-foreground: 0 0% 0%; /* Black #000000 */
-
-    --sidebar-border: 0 0% 0%; /* Black #000000 */
-
-    --sidebar-ring: 237 89% 52%; /* Royal Blue #1820EF */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 0 0% 5%; /* Dark cream */
-    --foreground: 60 25% 95%; /* Light cream */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 0 0% 8%; /* Darker card background */
-    --card-foreground: 60 25% 95%; /* Light cream text */
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 8%; /* Dark popover */
-    --popover-foreground: 60 25% 95%; /* Light cream text */
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 237 89% 52%; /* Keep Royal Blue */
-    --primary-foreground: 60 25% 95%; /* Light cream */
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 0 0% 15%; /* Dark secondary */
-    --secondary-foreground: 60 25% 95%; /* Light cream */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 0 0% 12%; /* Dark muted */
-    --muted-foreground: 60 25% 85%; /* Slightly darker cream */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 237 89% 52%; /* Royal Blue */
-    --accent-foreground: 60 25% 95%; /* Light cream */
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 8 100% 63%; /* Keep Cherry Red */
-    --destructive-foreground: 60 25% 95%; /* Light cream */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 0 0% 20%; /* Dark border */
-    --input: 0 0% 20%; /* Dark input border */
-    --ring: 237 89% 52%; /* Royal Blue focus ring */
-    --sidebar-background: 0 0% 8%;
-    --sidebar-foreground: 60 25% 95%;
-    --sidebar-primary: 237 89% 52%;
-    --sidebar-primary-foreground: 60 25% 95%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 60 25% 95%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 237 89% 52%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -167,17 +212,17 @@
 
   /* Dashboard Layout System */
   .dashboard-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8;
   }
-  
+
   .dashboard-grid {
     @apply grid gap-6 grid-cols-1 lg:grid-cols-12;
   }
-  
+
   .dashboard-main {
     @apply lg:col-span-8 space-y-6;
   }
-  
+
   .dashboard-sidebar {
     @apply lg:col-span-4 space-y-6;
   }
@@ -186,7 +231,7 @@
   .chart-container {
     @apply w-full h-[300px] sm:h-[400px] lg:h-[450px] p-4;
   }
-  
+
   .chart-container-large {
     @apply w-full h-[400px] sm:h-[500px] lg:h-[600px] p-6;
   }
@@ -195,15 +240,15 @@
   .card-summary {
     @apply bg-card border-border shadow-sm;
   }
-  
+
   .card-detailed {
     @apply bg-card border-border shadow-lg;
   }
-  
+
   .card-chart {
     @apply bg-card border-border shadow-lg min-h-[400px];
   }
-  
+
   .card-dashboard {
     @apply bg-card border-border shadow-md;
   }
@@ -296,7 +341,7 @@
   }
 
   .card-hover:hover {
-    transform: translateY(-2px);
+    transform: none;
     box-shadow: 0 8px 25px -8px hsl(var(--primary) / 0.1);
   }
 
@@ -306,28 +351,28 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted)) transparent;
   }
-  
+
   .table-responsive::-webkit-scrollbar {
     height: 8px;
   }
-  
+
   .table-responsive::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .table-responsive::-webkit-scrollbar-thumb {
     background: hsl(var(--muted));
     border-radius: 4px;
   }
-  
+
   .table-responsive::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--muted-foreground));
   }
-  
+
   .table-compact {
     @apply text-xs;
   }
-  
+
   .table-comfortable {
     @apply text-sm;
   }
@@ -349,13 +394,30 @@
     transition: none !important;
     overflow: visible !important;
   }
-  
+
   .exporting .chart-container {
     overflow: visible !important;
   }
-  
+
   .exporting * {
     transition: none !important;
     animation: none !important;
+  }
+
+  /* Hide any elements explicitly marked to be excluded during export */
+  .exporting [data-share-exclude],
+  .exporting [aria-label="Open share menu"],
+  .exporting [data-tooltip],
+  .exporting [role="tooltip"] {
+    display: none !important;
+  }
+
+  /* Export-only hard hide of any controls on export pages */
+  .export-mode [data-share-exclude],
+  .export-mode [aria-label="Open share menu"],
+  .export-mode [data-tooltip],
+  .export-mode button,
+  .export-mode [role="button"] {
+    display: none !important;
   }
 }

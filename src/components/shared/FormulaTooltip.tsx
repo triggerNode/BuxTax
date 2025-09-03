@@ -12,12 +12,19 @@ interface FormulaTooltipProps {
   variables?: Record<string, string>;
 }
 
-export function FormulaTooltip({ formula, description, variables }: FormulaTooltipProps) {
+export function FormulaTooltip({
+  formula,
+  description,
+  variables,
+}: FormulaTooltipProps) {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors">
+          <button
+            data-share-exclude="true"
+            className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+          >
             <HelpCircle className="h-4 w-4" />
             <span className="sr-only">Show formula</span>
           </button>
@@ -27,11 +34,11 @@ export function FormulaTooltip({ formula, description, variables }: FormulaToolt
             {description && (
               <p className="text-sm font-medium">{description}</p>
             )}
-            
+
             <div className="bg-muted/50 rounded p-2 font-mono text-xs">
               {formula}
             </div>
-            
+
             {variables && Object.keys(variables).length > 0 && (
               <div className="space-y-1">
                 <p className="text-xs font-medium">Where:</p>

@@ -16,11 +16,23 @@ import { FEE_CONSTANTS } from "@/lib/fees";
 
 interface RatesDrawerProps {
   onRatesChange?: (rates: any) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
 }
 
-export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
+export function RatesDrawer({
+  onRatesChange,
+  open,
+  onOpenChange,
+  showTrigger = true,
+}: RatesDrawerProps) {
   const [rates, setRates] = useState(FEE_CONSTANTS);
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const controlledOpen = open !== undefined ? open : internalOpen;
+  const handleOpenChange = onOpenChange ?? setInternalOpen;
 
   const handleDevExRateChange = (value: string) => {
     const numericValue = parseFloat(value) || 0;
@@ -29,7 +41,10 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
     onRatesChange?.(newRates);
   };
 
-  const handleMarketplaceFeeChange = (userType: 'GAME_DEV' | 'UGC_CREATOR', value: string) => {
+  const handleMarketplaceFeeChange = (
+    userType: "GAME_DEV" | "UGC_CREATOR",
+    value: string
+  ) => {
     const numericValue = (parseFloat(value) || 0) / 100;
     const newRates = {
       ...rates,
@@ -48,14 +63,16 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
   };
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Settings className="h-4 w-4" />
-          <span className="sr-only">Rates & Assumptions</span>
-        </Button>
-      </SheetTrigger>
-      
+    <Sheet open={controlledOpen} onOpenChange={handleOpenChange}>
+      {showTrigger && (
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <Settings className="h-4 w-4" />
+            <span className="sr-only">Rates & Assumptions</span>
+          </Button>
+        </SheetTrigger>
+      )}
+
       <SheetContent className="w-80 sm:w-96">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
@@ -63,7 +80,8 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
             Rates & Assumptions
           </SheetTitle>
           <SheetDescription>
-            Current marketplace rates and DevEx conversion rates. Advanced mode allows customization.
+            Current marketplace rates and DevEx conversion rates. Advanced mode
+            allows customization.
           </SheetDescription>
         </SheetHeader>
 
@@ -95,7 +113,7 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
           {/* Marketplace Fees */}
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Marketplace Fees</h4>
-            
+
             <div className="space-y-2">
               <Label htmlFor="game-dev-fee" className="text-sm">
                 Game Developer Fee (%)
@@ -108,7 +126,9 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
                   min="0"
                   max="100"
                   value={(rates.MARKETPLACE_FEE.GAME_DEV * 100).toFixed(0)}
-                  onChange={(e) => handleMarketplaceFeeChange('GAME_DEV', e.target.value)}
+                  onChange={(e) =>
+                    handleMarketplaceFeeChange("GAME_DEV", e.target.value)
+                  }
                   disabled={!isAdvancedMode}
                   className="flex-1"
                 />
@@ -128,7 +148,9 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
                   min="0"
                   max="100"
                   value={(rates.MARKETPLACE_FEE.UGC_CREATOR * 100).toFixed(0)}
-                  onChange={(e) => handleMarketplaceFeeChange('UGC_CREATOR', e.target.value)}
+                  onChange={(e) =>
+                    handleMarketplaceFeeChange("UGC_CREATOR", e.target.value)
+                  }
                   disabled={!isAdvancedMode}
                   className="flex-1"
                 />
@@ -152,7 +174,7 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
               size="sm"
               onClick={() => setIsAdvancedMode(!isAdvancedMode)}
             >
-              {isAdvancedMode ? 'Lock' : 'Unlock'}
+              {isAdvancedMode ? "Lock" : "Unlock"}
             </Button>
           </div>
 
@@ -172,7 +194,7 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
           {/* Source Attribution */}
           <div className="space-y-3">
             <h4 className="text-sm font-medium">Sources</h4>
-            
+
             <div className="space-y-2 text-xs text-muted-foreground">
               <div className="flex items-center justify-between">
                 <span>DevEx Rate:</span>
@@ -182,7 +204,7 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
                   className="h-auto p-0 text-xs"
                   asChild
                 >
-                  <a 
+                  <a
                     href="https://en.help.roblox.com/hc/en-us/articles/13061189551124-Developer-Exchange-DevEx-FAQs"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -193,7 +215,7 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
                   </a>
                 </Button>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span>Marketplace Fees:</span>
                 <Button
@@ -202,7 +224,7 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
                   className="h-auto p-0 text-xs"
                   asChild
                 >
-                  <a 
+                  <a
                     href="https://create.roblox.com/docs/production/earning-on-roblox"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -213,7 +235,7 @@ export function RatesDrawer({ onRatesChange }: RatesDrawerProps) {
                   </a>
                 </Button>
               </div>
-              
+
               <p className="text-xs text-muted-foreground mt-3">
                 Last updated: January 2025
               </p>

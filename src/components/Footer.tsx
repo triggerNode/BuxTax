@@ -19,6 +19,12 @@ export function Footer() {
           >
             Privacy
           </button>
+          <button
+            onClick={() => navigate("/blog")}
+            className="hover:text-foreground transition-colors"
+          >
+            Blog
+          </button>
           <a
             href="mailto:support@bux.tax"
             className="hover:text-foreground transition-colors"

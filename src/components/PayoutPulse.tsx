@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/select";
 import { BuxCard } from "@/components/shared/BuxCard";
 import { FileUpload } from "@/components/shared/FileUpload";
+import { GlassGate } from "@/components/shared/GlassGate";
+import { handleUpgrade } from "@/components/Paywall";
 import {
   parseCSV,
   exportToCSV,
@@ -59,11 +61,14 @@ interface FeeBreakdown {
 interface PayoutPulseProps {
   userType: "gameDev" | "ugcCreator";
   onDataChange?: (data: ParsedPayoutData[]) => void;
+  /** Free plan flag – when true, show glass overlay after data loads */
+  readonly?: boolean;
 }
 
 const PayoutPulse = memo(function PayoutPulse({
   userType,
   onDataChange,
+  readonly = false,
 }: PayoutPulseProps) {
   const { toast } = useToast();
   const { pulseState, updateState, setCsvData, getCsvData } =
@@ -373,249 +378,275 @@ const PayoutPulse = memo(function PayoutPulse({
   const effectiveTakeRate = getEffectiveTakeRate();
 
   return (
-    <div className="space-y-6">
-      {/* Summary Cards Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <BuxCard
-          title="Total Earnings"
-          icon={TrendingUp}
-          variant="dashboard"
-          size="sm"
-        >
-          <div className="text-center">
-            <div className="text-3xl font-bold text-primary mb-2">
-              {viewMode === "robux"
-                ? formatRobux(totalEarnings)
-                : formatCurrency(totalEarnings)}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {dateRange === "all" ? "All time" : `Last ${dateRange}`}
-            </p>
-            <div className="mt-3 text-xs text-primary/80 bg-primary/10 rounded-full px-3 py-1 inline-block">
-              Total Revenue
-            </div>
-          </div>
-        </BuxCard>
-
-        <BuxCard
-          title="Effective Take Rate"
-          icon={Calendar}
-          variant="dashboard"
-          size="sm"
-        >
-          <div className="text-center">
-            <div className="text-3xl font-bold text-destructive mb-2">
-              {effectiveTakeRate.toFixed(1)}%
-            </div>
-            <p className="text-sm text-muted-foreground">Platform + costs</p>
-            <div className="mt-3 text-xs text-destructive/80 bg-destructive/10 rounded-full px-3 py-1 inline-block">
-              Cost Rate
-            </div>
-          </div>
-        </BuxCard>
-
-        <BuxCard
-          title="Data Points"
-          icon={Upload}
-          variant="dashboard"
-          size="sm"
-        >
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-2">
-              {getFilteredData().length}
-            </div>
-            <p className="text-sm text-muted-foreground">Payout records</p>
-            <div className="mt-3 text-xs text-muted-foreground bg-muted/50 rounded-full px-3 py-1 inline-block">
-              Data Records
-            </div>
-          </div>
-        </BuxCard>
-      </div>
-
-      {/* Controls */}
-      <div className="flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex gap-4">
-          <Tabs
-            value={viewMode}
-            onValueChange={(value) =>
-              updateState({ viewMode: value as "robux" | "usd" })
-            }
-          >
-            <TabsList>
-              <TabsTrigger value="usd">USD View</TabsTrigger>
-              <TabsTrigger value="robux">Robux View</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          <Select
-            value={dateRange}
-            onValueChange={(value) =>
-              updateState({ dateRange: value as "all" | "30d" | "90d" })
-            }
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="30d">Last 30d</SelectItem>
-              <SelectItem value="90d">Last 90d</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
+    <GlassGate
+      show={readonly}
+      title={
+        userType === "ugcCreator"
+          ? "UGC analytics are premium"
+          : "Payout analytics are premium"
+      }
+      description={
+        userType === "ugcCreator"
+          ? "Upgrade to access UGC payout analytics."
+          : "Upgrade to unlock charts, fee breakdowns, and exports."
+      }
+      onCta={() => handleUpgrade("lifetime")}
+    >
+      <div className="space-y-6">
+        {/* Summary Cards Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <BuxCard
+            title="Total Earnings"
+            icon={TrendingUp}
+            variant="dashboard"
             size="sm"
-            onClick={handleExportData}
-            className="gap-2"
           >
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
-        </div>
-      </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary mb-2">
+                {viewMode === "robux"
+                  ? formatRobux(totalEarnings)
+                  : formatCurrency(totalEarnings)}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {dateRange === "all" ? "All time" : `Last ${dateRange}`}
+              </p>
+              <div className="mt-3 text-xs text-primary/80 bg-primary/10 rounded-full px-3 py-1 inline-block">
+                Total Revenue
+              </div>
+            </div>
+          </BuxCard>
 
-      {/* Chart */}
-      <BuxCard
-        title="Earnings Over Time"
-        icon={TrendingUp}
-        variant="chart"
-        size="xl"
-        shareable
-        shareData={{
-          netEarnings: totalEarnings,
-          effectiveTakeRate: effectiveTakeRate,
-        }}
-      >
-        <div className="chart-container">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+          <BuxCard
+            title="Effective Take Rate"
+            icon={Calendar}
+            variant="dashboard"
+            size="sm"
+          >
+            <div className="text-center">
+              <div className="text-3xl font-bold text-destructive mb-2">
+                {effectiveTakeRate.toFixed(1)}%
+              </div>
+              <p className="text-sm text-muted-foreground">Platform + costs</p>
+              <div className="mt-3 text-xs text-destructive/80 bg-destructive/10 rounded-full px-3 py-1 inline-block">
+                Cost Rate
+              </div>
+            </div>
+          </BuxCard>
+
+          <BuxCard
+            title="Data Points"
+            icon={Upload}
+            variant="dashboard"
+            size="sm"
+          >
+            <div className="text-center">
+              <div className="text-3xl font-bold mb-2">
+                {getFilteredData().length}
+              </div>
+              <p className="text-sm text-muted-foreground">Payout records</p>
+              <div className="mt-3 text-xs text-muted-foreground bg-muted/50 rounded-full px-3 py-1 inline-block">
+                Data Records
+              </div>
+            </div>
+          </BuxCard>
+        </div>
+
+        {/* Controls */}
+        <div className="flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex gap-4">
+            <Tabs
+              value={viewMode}
+              onValueChange={(value) =>
+                updateState({ viewMode: value as "robux" | "usd" })
+              }
             >
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 12 }}
-                tickLine={{ strokeOpacity: 0.3 }}
-                axisLine={{ strokeOpacity: 0.3 }}
-              />
-              <YAxis
-                tick={{ fontSize: 12 }}
-                tickLine={{ strokeOpacity: 0.3 }}
-                axisLine={{ strokeOpacity: 0.3 }}
-                tickFormatter={(value) =>
-                  viewMode === "robux"
-                    ? `${(value / 1000).toFixed(0)}k`
-                    : `$${value.toFixed(0)}`
-                }
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 6px -1px hsl(var(--foreground) / 0.1)",
-                }}
-                formatter={(value: number) => [
-                  viewMode === "robux"
-                    ? formatRobux(value)
-                    : formatCurrency(value),
-                  viewMode === "robux" ? "Net Robux" : "Net USD",
-                ]}
-                labelStyle={{ color: "hsl(var(--foreground))" }}
-              />
-              <Line
-                type="monotone"
-                dataKey={viewMode === "robux" ? "netRobux" : "netUSD"}
-                stroke="hsl(var(--primary))"
-                strokeWidth={3}
-                dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
-                activeDot={{
-                  r: 7,
-                  strokeWidth: 0,
-                  fill: "hsl(var(--primary-glow))",
-                }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </BuxCard>
+              <TabsList>
+                <TabsTrigger value="usd">USD View</TabsTrigger>
+                <TabsTrigger value="robux">Robux View</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-      {/* Fee Breakdown */}
-      <BuxCard
-        title="Fee Breakdown"
-        icon={Filter}
-        variant="detailed"
-        size="lg"
-        shareable
-        userType={userType}
-        cardType="fee"
-        dataSourceId="buxtax-card-fee-breakdown"
-        shareData={{
-          netEarnings: totalEarnings,
-          effectiveTakeRate: effectiveTakeRate,
-        }}
-      >
-        <EnhancedTable
-          exportable
-          onExport={() => {
-            const csvContent =
-              "data:text/csv;charset=utf-8," +
-              "Category,Robux,USD,Percentage\n" +
-              feeBreakdown
-                .map(
-                  (fee) =>
-                    `${fee.category},${fee.totalRobux},${fee.totalUSD.toFixed(
-                      2
-                    )},${fee.percentage.toFixed(1)}%`
-                )
-                .join("\n");
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "fee_breakdown.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            <Select
+              value={dateRange}
+              onValueChange={(value) =>
+                updateState({ dateRange: value as "all" | "30d" | "90d" })
+              }
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="30d">Last 30d</SelectItem>
+                <SelectItem value="90d">Last 90d</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              variant="action"
+              size="sm"
+              onClick={handleExportData}
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export CSV
+            </Button>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <BuxCard
+          title="Earnings Over Time"
+          icon={TrendingUp}
+          variant="chart"
+          size="xl"
+          shareable
+          shareData={{
+            netEarnings: totalEarnings,
+            effectiveTakeRate: effectiveTakeRate,
           }}
         >
-          <TableHeader>
-            <TableRow className="border-b border-border">
-              <TableHead className="font-semibold">Category</TableHead>
-              <TableHead className="text-right font-semibold">Robux</TableHead>
-              <TableHead className="text-right font-semibold">USD</TableHead>
-              <TableHead className="text-right font-semibold">
-                % of Gross
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {feeBreakdown.map((fee, index) => (
-              <TableRow
-                key={index}
-                className="hover:bg-muted/30 transition-colors"
-              >
-                <TableCell className="font-medium py-3">
-                  {fee.category}
-                </TableCell>
-                <TableCell className="text-right text-destructive font-mono py-3">
-                  -{formatRobux(fee.totalRobux)}
-                </TableCell>
-                <TableCell className="text-right text-destructive font-mono py-3">
-                  -{formatCurrency(fee.totalUSD)}
-                </TableCell>
-                <TableCell className="text-right font-semibold py-3">
-                  {fee.percentage.toFixed(1)}%
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </EnhancedTable>
-      </BuxCard>
-    </div>
+          <div className="bg-card rounded-2xl border-2 border-brand-royal p-4">
+            <div className="chart-container">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    tickLine={{ strokeOpacity: 0.3 }}
+                    axisLine={{ strokeOpacity: 0.3 }}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 12 }}
+                    tickLine={{ strokeOpacity: 0.3 }}
+                    axisLine={{ strokeOpacity: 0.3 }}
+                    tickFormatter={(value) =>
+                      viewMode === "robux"
+                        ? `${(value / 1000).toFixed(0)}k`
+                        : `$${value.toFixed(0)}`
+                    }
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                      boxShadow: "0 4px 6px -1px hsl(var(--foreground) / 0.1)",
+                    }}
+                    formatter={(value: number) => [
+                      viewMode === "robux"
+                        ? formatRobux(value)
+                        : formatCurrency(value),
+                      viewMode === "robux" ? "Net Robux" : "Net USD",
+                    ]}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey={viewMode === "robux" ? "netRobux" : "netUSD"}
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={3}
+                    dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 5 }}
+                    activeDot={{
+                      r: 7,
+                      strokeWidth: 0,
+                      fill: "hsl(var(--primary-glow))",
+                    }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </BuxCard>
+
+        {/* Fee Breakdown */}
+        <BuxCard
+          title="Fee Breakdown"
+          icon={Filter}
+          variant="detailed"
+          size="lg"
+          shareable
+          userType={userType}
+          cardType="fee"
+          dataSourceId="buxtax-card-fee-breakdown"
+          shareData={{
+            netEarnings: totalEarnings,
+            effectiveTakeRate: effectiveTakeRate,
+          }}
+        >
+          <div className="bg-card rounded-2xl border-2 border-brand-royal p-4">
+            <EnhancedTable
+              exportable
+              onExport={() => {
+                const csvContent =
+                  "data:text/csv;charset=utf-8," +
+                  "Category,Robux,USD,Percentage\n" +
+                  feeBreakdown
+                    .map(
+                      (fee) =>
+                        `${fee.category},${
+                          fee.totalRobux
+                        },${fee.totalUSD.toFixed(2)},${fee.percentage.toFixed(
+                          1
+                        )}%`
+                    )
+                    .join("\n");
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "fee_breakdown.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
+              className="[&_th]:border-brand-royal [&_td]:border-brand-royal [&_.negative]:text-destructive [&_.total]:text-primary"
+            >
+              <TableHeader>
+                <TableRow className="border-b border-border">
+                  <TableHead className="font-semibold">Category</TableHead>
+                  <TableHead className="text-right font-semibold">
+                    Robux
+                  </TableHead>
+                  <TableHead className="text-right font-semibold">
+                    USD
+                  </TableHead>
+                  <TableHead className="text-right font-semibold">
+                    % of Gross
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {feeBreakdown.map((fee, index) => (
+                  <TableRow
+                    key={index}
+                    className="hover:bg-muted/30 transition-colors"
+                  >
+                    <TableCell className="font-medium py-3">
+                      {fee.category}
+                    </TableCell>
+                    <TableCell className="text-right text-destructive font-mono py-3">
+                      -{formatRobux(fee.totalRobux)}
+                    </TableCell>
+                    <TableCell className="text-right text-destructive font-mono py-3">
+                      -{formatCurrency(fee.totalUSD)}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold py-3">
+                      {fee.percentage.toFixed(1)}%
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </EnhancedTable>
+          </div>
+        </BuxCard>
+      </div>
+    </GlassGate>
   );
 });
 

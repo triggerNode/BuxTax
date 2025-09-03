@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "question": "How accurate are the conversion rates?",
+    "answer": "Our rates are updated regularly and based on Roblox's official DevEx program rates. We include all applicable fees for the most accurate calculations."
+  },
+  {
+    "id": 2,
+    "question": "Do I need to be eligible for DevEx to use this?",
+    "answer": "No! BuxTax is useful for anyone wanting to understand Robux-to-USD conversions, whether you're planning for future DevEx or just curious about values."
+  },
+  {
+    "id": 3,
+    "question": "Is my data secure?",
+    "answer": "Yes. We don't store any of your calculation data permanently. All calculations are done client-side for maximum privacy."
+  },
+  {
+    "id": 4,
+    "question": "What's the difference between Lifetime and Studio plans?",
+    "answer": "Lifetime gives you unlimited access to all core features for $39 one-time. Studio includes advanced analytics and priority support for $149."
+  },
+  {
+    "id": 5,
+    "question": "Is lifetime pricing limited-time?",
+    "answer": "Yes. Our one-time ‘buy once’ lifetime access is available for 30 days. After that, new customers will be on a subscription plan. Purchases made during this window keep lifetime access permanently."
+  }
+]

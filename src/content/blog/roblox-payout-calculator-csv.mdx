@@ -1,0 +1,206 @@
+---
+title: "Roblox Payout Calculator (CSV): See Your Real Earnings Trend"
+date: "2025-08-31"
+description: "Export your payout CSV and turn it into clear charts. Spot trends, seasonality, and USD in minutes."
+tags: ["csv", "payouts", "analytics"]
+slug: "roblox-payout-calculator-csv"
+image: "/og/roblox-payout-calculator-csv.png"
+imageAlt: "Spreadsheet transforming into a line chart"
+canonical: "https://bux.tax/blog/roblox-payout-calculator-csv"
+featureRank: 2
+---
+
+Guessing on earnings leaves money on the table. Export your payout CSV, drop it into BuxTax, and you’ll see clean charts for Robux and USD, cumulative progress, and moving averages, fast.
+
+## Export your CSV (2025)
+
+**Personal account steps**
+
+- Sign in at **roblox.com**.
+- Click your **Robux** balance, then **My Transactions**.
+- Choose **Sales of Goods**, then select **Download** or **Download Data**.
+- Pick a **calendar month**. The CSV arrives by email in a ZIP. Unzip to get the CSV.
+
+**Group or studio steps**
+
+- Open your **Group** → **…** → **Configure Group** (sometimes labeled **Configure Community**).
+- Go to **Revenue** → **Sales**, then click **Download** and choose a month.
+
+> Tip: If the Download button is missing or errors, try again later, and confirm you’re on the correct tab (**Sales of Goods**). Group and personal pages behave differently.
+
+**Key columns you’ll see (exact field names):**
+
+- `Buyer User Id`
+- `Sale Date and Time` (UTC)
+- `Sale Location`
+- `Sale Location Id`
+- `Universe Id`
+- `Universe`
+- `Asset Id`
+- `Asset Name`
+- `Asset Type` (for example, Game Pass, Private Server, TShirt, Developer Product)
+- `Hold Status` (released vs. in hold)
+- `Revenue` (Robux you receive post‑fees)
+- `Price` (Robux paid by the buyer)
+
+## Upload to BuxTax → instant charts
+
+- **Sign‑in gate:** Log in to BuxTax, click **Upload CSV**, then select the file you exported. You’re done.
+- **Privacy:** BuxTax reads your CSV. We **never** ask for Roblox credentials.
+- **You’ll see these charts right away:**
+
+  - **Monthly earnings (Robux and USD):** totals per month, plus automatic USD conversion at the current DevEx rate, for example **$3.50 per 1,000 R$**.
+  - **Cumulative earnings:** your lifetime curve, with progress toward targets like **100,000 R$** for DevEx.
+  - **Moving averages (7‑day and 30‑day):** smooth noise so you see the real trend. Useful for post‑update impact, ads tests, or UGC drops.
+
+[Open the calculator](/calculator?utm_source=blog&utm_medium=article&utm_campaign=inline) for a quick conversion anytime.
+
+## Read your earnings: trends & seasonality
+
+- **Spikes and dips:** expect **summer** and **holiday** bumps. Back‑to‑school months often soften. Use the 30‑day moving average to separate updates from seasonality.
+- **Holds and gaps:** new sales show as **on hold** for a period before release. **Creator Rewards** (replacement for Premium Payouts) use about a **60‑day** hold and settlement window. Temporary day‑to‑day swings, including adjustments, appear before settlement. BuxTax charts track final posted amounts so you see the real trend.
+
+## Example data
+
+**Tiny sample CSV (4 rows)**
+
+```csv
+Buyer User Id,Sale Date and Time,Sale Location,Sale Location Id,Universe Id,Universe,Asset Id,Asset Name,Asset Type,Hold Status,Revenue,Price
+453219876,2025-07-02T18:14:22Z,Game,1122334455,667788990,My Obby,123456789,VIP Access,Game Pass,Released,70,100
+492880014,2025-07-09T21:05:11Z,Game,1122334455,667788990,My Obby,223344556,2x Coins,Developer Product,Released,35,50
+517700331,2025-07-15T09:47:00Z,Game,1122334455,667788990,My Obby,998877665,Private Server,Private Server,Hold,139,199
+601443220,2025-07-28T13:32:44Z,Game,1122334455,667788990,My Obby,334455667,500 Gems,Developer Product,Hold,140,200
+```
+
+**What the charts show from this sample**
+
+| View                          | What you’d see                                                                            |
+| ----------------------------- | ----------------------------------------------------------------------------------------- |
+| Monthly earnings (R$ and USD) | **July:** 384 R$ total ⇒ **$1.34 USD** at the DevEx rate (estimate).                      |
+| Cumulative earnings           | Day‑by‑day staircase up to **384 R$** by 7/28.                                            |
+| 7‑day moving average          | Modest rise around **7/28** due to the 200 R$ sale, with a smoother line vs daily spikes. |
+
+## Try it now
+
+**Primary:** [Upload your CSV → charts in minutes](/calculator?utm_source=blog&utm_medium=article&utm_campaign=cta)
+
+**Secondary:** [Prefill with 100,000 R$ example](/calculator?r=100000&utm_source=blog&utm_medium=article&utm_campaign=cta)
+
+_Use code **FOUNDERS50** for 50% off._
+
+## FAQ
+
+**Where is the CSV export?**  
+Personal: **Robux** → **My Transactions** → **Sales of Goods** → **Download**.  
+Group: **Group** → **Configure Group/Community** → **Revenue** → **Sales** → **Download** (pick a month).
+
+**What if column names changed?**  
+Roblox sometimes updates fields. Core columns for trend charts: `Sale Date and Time`, `Revenue`, and optionally `Price` and `Asset Type`. BuxTax maps common variants automatically, and you re‑map during upload if needed.
+
+**Does Creator Rewards appear in the CSV, and when?**  
+Creator Rewards accrue daily but settle after about **60 days**. Temporary adjustments appear before settlement. Once released as Earned Robux, amounts roll into your CSV‑based trend like sales.
+
+**How often should I export?**  
+At least monthly, since exports are month‑based. Active teams export **weekly** and append to keep dashboards current. BuxTax handles merges and duplicates.
+
+**How do I track team splits or multiple experiences?**  
+Use `Universe Id` or `Universe` to segment by experience. For teams, upload CSVs per group or user and tag them. BuxTax lets you filter and compare.
+
+**What if the download button is missing or errors?**  
+It happens. Switch between personal and group pages, refresh, then retry later. Confirm you’re on **Sales of Goods** with a valid month selected.
+
+---
+
+Want deeper dives? See [Robux → USD DevEx Rate (2025)](/blog/robux-to-usd-rates) and [DevEx Fees Explained (with examples)](/blog/devex-fees-explained-examples).
+
+---
+
+> "Estimates only / not affiliated with Roblox."
+
+### Sources (last 90 days)
+
+- Roblox DevForum: _Creator Rewards is Live_ (07/24/2025): [https://devforum.roblox.com/t/creator-rewards-is-live/3838257](https://devforum.roblox.com/t/creator-rewards-is-live/3838257)
+- Roblox DevForum: _Creator Rewards Showing Negative Amounts (settlement/adjustments guidance)_ (08/22/2025): [https://devforum.roblox.com/t/creator-rewards-showing-negative-amounts/3893060](https://devforum.roblox.com/t/creator-rewards-showing-negative-amounts/3893060)
+- Roblox DevForum: _Unable to download sales data from the community (Download button visibility on Revenue → Sales)_ (07/03/2025): [https://devforum.roblox.com/t/unable-to-download-sales-data-from-the-community/3796429](https://devforum.roblox.com/t/unable-to-download-sales-data-from-the-community/3796429)
+- Roblox DevForum: _Unknown Error occurs while downloading user Sales of Goods data (rate/limit behavior)_ (08/30/2025): [https://devforum.roblox.com/t/unknown-error-occurs-while-downloading-user-sales-of-goods-data/3908564](https://devforum.roblox.com/t/unknown-error-occurs-while-downloading-user-sales-of-goods-data/3908564)
+- The Verge: _Roblox wants to better reward creators for bringing players back (Creator Rewards overview and timing)_ (06/24/2025): [https://www.theverge.com/news/691308/roblox-daily-engagement-audience-expansion-reward-program-payouts-creator-rewards](https://www.theverge.com/news/691308/roblox-daily-engagement-audience-expansion-reward-program-payouts-creator-rewards)
+- Roblox Creator Hub Docs: _Creator Rewards_ (07/24/2025): [https://create.roblox.com/docs/creator-rewards](https://create.roblox.com/docs/creator-rewards)
+
+---
+
+<script type="application/ld+json">{`
+{
+  "@context":"https://schema.org",
+  "@type":"Article",
+  "headline":"Roblox Payout Calculator (CSV): See Your Real Earnings Trend",
+  "description":"Export your payout CSV and turn it into clear charts. Spot trends, seasonality, and USD in minutes.",
+  "image":"https://bux.tax/og/roblox-payout-calculator-csv.png",
+  "imageAlt":"Spreadsheet transforming into a line chart",
+  "datePublished":"2025-08-31",
+  "dateModified":"2025-08-31",
+  "author":{"@type":"Organization","name":"BuxTax"},
+  "publisher":{
+    "@type":"Organization",
+    "name":"BuxTax",
+    "logo":{"@type":"ImageObject","url":"https://bux.tax/logo.png"}
+  },
+  "mainEntityOfPage":{"@type":"WebPage","@id":"https://bux.tax/blog/roblox-payout-calculator-csv"}
+}
+`}</script>
+
+<script type="application/ld+json">{`
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {
+      "@type":"Question",
+      "name":"Where is the CSV export?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"Personal: Robux → My Transactions → Sales of Goods → Download. Group: Group → Configure Group/Community → Revenue → Sales → Download (pick a month)."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"What if column names changed?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"Roblox sometimes updates fields. Core columns for trend charts are Sale Date and Time, Revenue, and optionally Price and Asset Type. BuxTax maps common variants and lets you remap during upload."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"Does Creator Rewards appear in the CSV, and when?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"Creator Rewards accrue daily but settle after about 60 days. Temporary adjustments appear before settlement. Once released, amounts roll into your CSV-based charts like any other earnings."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"How often should I export?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"At least monthly, since exports are month-based. Weekly exports keep dashboards fresh; BuxTax de-duplicates and merges uploads."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"How do I track team splits or multiple experiences?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"Use Universe Id or Universe to compare experiences. Upload separate CSVs for group vs. user and tag them for team reporting."
+      }
+    },
+    {
+      "@type":"Question",
+      "name":"What if the download button is missing or errors?",
+      "acceptedAnswer":{
+        "@type":"Answer",
+        "text":"Retry later—UI issues pop up periodically. Confirm you’re on Sales of Goods with a valid month selected; switching between personal and group pages often resolves it."
+      }
+    }
+  ]
+}
+`}</script>

@@ -1,0 +1,60 @@
+---
+title: "Seasonality in Payouts: What CSVs Usually Reveal"
+date: "2025-08-31"
+description: "Read your payout CSV for seasonal patterns. Spot spikes, plan cashouts, and budget ad spend with simple charts."
+tags: ["seasonality", "payouts", "analytics"]
+slug: "seasonality-in-roblox-payouts"
+image: "/og/seasonality-in-roblox-payouts.png"
+imageAlt: "Seasonality trend line highlighting summer and holidays"
+canonical: "https://bux.tax/blog/seasonality-in-roblox-payouts"
+---
+
+If your earnings feel lumpy, that’s normal. Roblox traffic, spending, and payouts swing with school calendars and holidays. Read your CSV, predict the lumps, then turn them into a plan.
+
+## Export your CSV (quick refresher)
+
+- **Personal account:** `roblox.com/transactions` → Type of Transaction: Sales of Goods → download → pick a month (Robux CSV arrives by email).
+- **Group:** Configure Group → Revenue → Sales (Sales of Goods) → Download data (monthly CSV).
+- If the button disappears or errors, try again later. Roblox acknowledged intermittent UI and rate‑limit issues this summer.
+
+## Make the charts (fast)
+
+BuxTax auto‑parses your CSV and shows three views:
+
+1. **Month over month (MoM)** — Robux and USD side by side so step changes stand out.
+2. **7‑/30‑day moving average** — Smooths weekday noise and update spikes.
+3. **Year over year (YoY) compare** — With 12+ months, you get the cleanest read on seasonality.
+
+## What 2025 looks like
+
+- **Summer spikes (June–August):** Roblox hit new all‑time concurrent peaks in late August 2025. Expect uplift in sessions, spend, and payouts.
+- **December holidays:** Gift cards and time off lift engagement late November/December.
+- **School and exams:** May/June exam periods soften playtime. September back‑to‑school often dips.
+- **Creator Rewards timing:** Launched July 24, 2025. Awards accrue as **Earned Robux** with a **60‑day hold** before they move to available balance; payouts can lag earnings.
+
+## Turn patterns into a plan
+
+- **Cash‑out cadence:** Schedule DevEx after expected highs, not during dips.
+- **Ad budget:** Shift spend into weeks where MoM and the 30‑day average both trend up.
+- **Content beats:** Ship updates ahead of known peaks, then watch the 7‑day average for momentum.
+
+## Example data
+
+### Tiny sample CSV (monthly roll‑ups)
+
+```csv
+date,robux_revenue,usd_estimate,notes
+2025-05-31,120000,420.00,Pre-summer baseline
+2025-06-30,160000,560.00,Summer lift begins
+2025-07-31,230000,805.00,Peak summer + event
+2025-08-31,190000,665.00,Still elevated
+```
+
+### Read it
+
+- June lifts above May, July peaks, August stays higher than the baseline.
+- If Creator Rewards earnings start on July 24, first payouts appear near late September because of the 60‑day hold.
+
+---
+
+Need help parsing your CSV or building these charts? BuxTax does this for you automatically from the same files you download above.

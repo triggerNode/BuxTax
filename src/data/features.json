@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Profit Calculator",
+    "description": "Run accurate Robux → USD conversions and see true take‑home instantly.",
+    "icon": "calculator",
+    "image": "/screenshots/Profit Calculator.png",
+    "alt": "Profit Calculator screenshot"
+  },
+  {
+    "id": 2,
+    "title": "Goal Seeker 🤑",
+    "description": "Set earnings targets and track your progress in a fun, focused view.",
+    "icon": "share",
+    "image": "/screenshots/Goals.png",
+    "alt": "Goals page screenshot"
+  },
+  {
+    "id": 3,
+    "title": "Payout Pulse",
+    "description": "Visualize your earnings trends with clean, insightful charts.",
+    "icon": "pie-chart",
+    "image": "/screenshots/Payout Pulse.png",
+    "alt": "Payout Pulse charts screenshot"
+  }
+]

@@ -1,4 +1,5 @@
 import html2canvas from "html2canvas";
+import domtoimage from "dom-to-image-more";
 
 export interface ExportOptions {
   format: "png" | "pdf";
@@ -10,12 +11,10 @@ export interface ExportOptions {
 // Helper function to resolve CSS custom properties to actual color values
 function resolveBackgroundColor(): string {
   try {
-    // Try to get the computed background color from the document body or html element
     const computedStyle = getComputedStyle(document.documentElement);
     const bgColor = computedStyle.getPropertyValue("--background").trim();
-
     if (bgColor) {
-      // If we have a custom property value, try to resolve it
+      // Already a concrete color function or hex
       if (
         bgColor.startsWith("hsl(") ||
         bgColor.startsWith("rgb(") ||
@@ -23,23 +22,127 @@ function resolveBackgroundColor(): string {
       ) {
         return bgColor;
       }
-      // Handle space-separated HSL values like "0 0% 100%"
-      if (bgColor.match(/^\d+\s+\d+%\s+\d+%$/)) {
+      // Support HSL channel tokens like "60 56.5% 95.5%"
+      if (bgColor.match(/^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%$/)) {
         return `hsl(${bgColor})`;
       }
     }
-
-    // Fallback: check if we're in dark mode by looking at common indicators
     const isDarkMode =
       document.documentElement.classList.contains("dark") ||
       document.body.classList.contains("dark") ||
       window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    // Return appropriate background color
     return isDarkMode ? "#0a0a0a" : "#ffffff";
   } catch (error) {
     console.warn("Failed to resolve background color, using default:", error);
-    return "#ffffff"; // Safe fallback
+    return "#ffffff";
+  }
+}
+
+async function waitForFonts(): Promise<void> {
+  try {
+    const f: any = (document as any).fonts;
+    if (f?.ready) await f.ready;
+  } catch {}
+  await new Promise((r) => setTimeout(r, 100));
+}
+
+function visibleCenter(el: HTMLElement) {
+  try {
+    (el as any).scrollIntoView({
+      block: "center",
+      inline: "center",
+      behavior: "instant" as any,
+    });
+  } catch {}
+}
+
+async function rasterizeWithH2C(node: HTMLElement): Promise<HTMLCanvasElement> {
+  // html2canvas expects a valid CSS color. Our design tokens store HSL channels
+  // like "220 14% 96%" in `--background`, which breaks html2canvas' parser.
+  // Resolve to a concrete color string first.
+  const backgroundColor = resolveBackgroundColor() || "#fff";
+  const c = await html2canvas(node, {
+    backgroundColor,
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    foreignObjectRendering: false,
+    scrollX: 0,
+    scrollY: 0,
+    onclone: (doc: Document) => {
+      try {
+        doc.querySelectorAll("[data-share-exclude]").forEach((n) => {
+          (n as HTMLElement).style.display = "none";
+        });
+        const s = doc.createElement("style");
+        s.textContent = `*{animation:none!important;transition:none!important}
+          .rounded-full{display:inline-flex!important;align-items:center!important;justify-content:center!important;line-height:1!important}`;
+        doc.head.appendChild(s);
+      } catch (e) {
+        console.warn("Export: onclone normalization failed", e);
+      }
+    },
+  });
+  return c;
+}
+
+async function rasterizeWithDomToImage(
+  node: HTMLElement
+): Promise<HTMLCanvasElement> {
+  const backgroundColor = resolveBackgroundColor() || "#fff";
+  const dataUrl: string = await domtoimage.toPng(node, {
+    bgcolor: backgroundColor,
+    style: {
+      animation: "none",
+      transition: "none",
+    },
+    filter: (n: Node) =>
+      !(n instanceof Element && n.hasAttribute("data-share-exclude")),
+    // Force deterministic viewport
+    quality: 1,
+    cacheBust: true,
+  });
+  const img = new Image();
+  img.src = dataUrl;
+  await new Promise((resolve, reject) => {
+    img.onload = resolve as any;
+    img.onerror = reject as any;
+  });
+  const canvas = document.createElement("canvas");
+  const scale = 1; // dom-to-image already renders sharply; adjust if needed
+  canvas.width = Math.max(
+    1,
+    Math.floor((img.naturalWidth || img.width) * scale)
+  );
+  canvas.height = Math.max(
+    1,
+    Math.floor((img.naturalHeight || img.height) * scale)
+  );
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
+  return canvas;
+}
+
+async function rasterize(element: HTMLElement): Promise<HTMLCanvasElement> {
+  visibleCenter(element);
+  await waitForFonts();
+  try {
+    const c = await rasterizeWithH2C(element);
+    return c;
+  } catch (e) {
+    console.warn(
+      "Export: html2canvas failed, attempting dom-to-image fallback",
+      e
+    );
+    try {
+      const c2 = await rasterizeWithDomToImage(element);
+      return c2;
+    } catch (e2) {
+      console.error("Export: dom-to-image fallback failed", e2);
+      throw new Error("Export failed: Unable to rasterize card");
+    }
   }
 }
 
@@ -49,7 +152,6 @@ export async function exportCard(
 ): Promise<void> {
   let element = document.getElementById(elementId);
 
-  // Fallback strategy: try alternative element IDs if primary not found
   if (!element) {
     console.warn(
       `Element with ID "${elementId}" not found. Trying fallback IDs...`
@@ -65,88 +167,25 @@ export async function exportCard(
   }
 
   if (!element) {
-    // Log all elements with IDs containing "buxtax" for debugging
     console.error('Available elements with "buxtax" in ID:');
     document.querySelectorAll('[id*="buxtax"]').forEach((el) => {
-      console.log(`- ${el.id}`);
+      console.log(`- ${(el as HTMLElement).id}`);
     });
-
     throw new Error(
-      `Element with ID "${elementId}" not found. Also tried fallback IDs: main-content, root. Check console for available elements.`
+      `Element with ID "${elementId}" not found. Also tried fallback IDs: main-content, root.`
     );
   }
 
   try {
     console.log("Found element to export:", element);
     console.log("Element dimensions:", {
-      width: element.offsetWidth,
-      height: element.offsetHeight,
+      width: (element as HTMLElement).offsetWidth,
+      height: (element as HTMLElement).offsetHeight,
     });
 
-    // Resolve background color before rendering
-    const backgroundColor = resolveBackgroundColor();
-    console.log("Resolved background color:", backgroundColor);
-
-    // Add export class for styling during capture
     element.classList.add("exporting");
-
-    // Wait a bit for any dynamic content to render
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const canvas = await html2canvas(element, {
-      backgroundColor: backgroundColor,
-      scale: options.quality || 2,
-      useCORS: true,
-      allowTaint: true,
-      foreignObjectRendering: false,
-      logging: false,
-      width: element.offsetWidth,
-      height: element.offsetHeight,
-      removeContainer: true,
-      scrollX: 0,
-      scrollY: 0,
-      onclone: (clonedDoc) => {
-        try {
-          // Ensure styles are preserved in the clone and fix CSS custom properties
-          const clonedElement = clonedDoc.getElementById(element.id);
-          if (clonedElement) {
-            clonedElement.style.transform = "none";
-            clonedElement.style.position = "static";
-
-            // Fix any CSS custom properties in the cloned document
-            const allElements = clonedDoc.querySelectorAll("*");
-            allElements.forEach((el) => {
-              const htmlEl = el as HTMLElement;
-
-              // Fix background colors with CSS custom properties
-              if (
-                htmlEl.style.backgroundColor &&
-                htmlEl.style.backgroundColor.includes("var(")
-              ) {
-                const computedStyle = getComputedStyle(htmlEl);
-                const resolvedBg = computedStyle.backgroundColor;
-                if (resolvedBg && resolvedBg !== "rgba(0, 0, 0, 0)") {
-                  htmlEl.style.backgroundColor = resolvedBg;
-                }
-              }
-
-              // Fix color properties with CSS custom properties
-              if (htmlEl.style.color && htmlEl.style.color.includes("var(")) {
-                const computedStyle = getComputedStyle(htmlEl);
-                const resolvedColor = computedStyle.color;
-                if (resolvedColor) {
-                  htmlEl.style.color = resolvedColor;
-                }
-              }
-            });
-          }
-        } catch (cloneError) {
-          console.warn("Error processing cloned document:", cloneError);
-        }
-      },
-    });
-
-    // Remove export class
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const canvas = await rasterize(element as HTMLElement);
     element.classList.remove("exporting");
 
     if (options.addWatermark !== false) {
@@ -154,51 +193,50 @@ export async function exportCard(
     }
 
     const filename = options.filename || `buxtax-${Date.now()}`;
-
     if (options.format === "png") {
       downloadCanvas(canvas, `${filename}.png`);
     } else if (options.format === "pdf") {
       await exportToPDF(canvas, `${filename}.pdf`);
     }
   } catch (error) {
-    // Remove export class in case of error
     element.classList.remove("exporting");
-    console.error("html2canvas error details:", error);
-
-    // Provide more specific error messages
+    console.error("Export pipeline error:", error);
     if (error instanceof Error) {
-      if (error.message.includes("angle")) {
-        throw new Error(
-          "Export failed due to unsupported CSS properties. This may be caused by gradients or CSS custom properties that html2canvas cannot process."
-        );
-      } else if (error.message.includes("taint")) {
-        throw new Error(
-          "Export failed due to cross-origin image restrictions. Some images may not be accessible."
-        );
-      } else {
-        throw new Error(`Export failed: ${error.message}`);
-      }
+      throw new Error(`Export failed: ${error.message}`);
     }
     throw error;
   }
 }
 
+export async function captureCardImageBlob(elementId: string): Promise<Blob> {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    throw new Error(
+      `captureCardImageBlob: element with ID "${elementId}" not found.`
+    );
+  }
+  await waitForFonts();
+  const canvas = await rasterize(element as HTMLElement);
+  return await new Promise((resolve, reject) =>
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error("toBlob failed"))),
+      "image/png"
+    )
+  );
+}
+
 function addBuxTaxWatermark(canvas: HTMLCanvasElement): void {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
-
-  // Add subtle BuxTax watermark in bottom right
   ctx.save();
   ctx.globalAlpha = 0.7;
-  ctx.fillStyle = "#6b7280"; // Use a proper color value instead of CSS custom properties
+  ctx.fillStyle = "#3F3F46";
   ctx.font = "12px Inter, system-ui, sans-serif";
   ctx.textAlign = "right";
-
   const text = "BuxTax.com";
   const padding = 16;
   const x = canvas.width - padding;
   const y = canvas.height - padding;
-
   ctx.fillText(text, x, y);
   ctx.restore();
 }
@@ -207,7 +245,6 @@ function downloadCanvas(canvas: HTMLCanvasElement, filename: string): void {
   const link = document.createElement("a");
   link.download = filename;
   link.href = canvas.toDataURL("image/png", 1.0);
-
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -218,20 +255,39 @@ async function exportToPDF(
   filename: string
 ): Promise<void> {
   const { jsPDF } = await import("jspdf");
+  // A4 page size in mm
+  const pageWidth = 210;
+  const pageHeight = 297;
 
-  // Calculate dimensions to fit the canvas in the PDF
-  const imgWidth = 210; // A4 width in mm
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  // Add comfortable margins and center the card on the page
+  const margin = 12; // mm
+  const maxImgWidth = pageWidth - margin * 2;
+  const maxImgHeight = pageHeight - margin * 2;
 
+  // Maintain aspect ratio
+  let imgWidth = maxImgWidth;
+  let imgHeight = (canvas.height * imgWidth) / canvas.width;
+  if (imgHeight > maxImgHeight) {
+    imgHeight = maxImgHeight;
+    imgWidth = (canvas.width * imgHeight) / canvas.height;
+  }
+
+  const isLandscape = imgWidth > imgHeight;
   const pdf = new jsPDF({
-    orientation: imgHeight > imgWidth ? "portrait" : "landscape",
+    orientation: isLandscape ? "landscape" : "portrait",
     unit: "mm",
     format: "a4",
   });
 
-  const imgData = canvas.toDataURL("image/png", 1.0);
-  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+  // Recompute page size according to orientation
+  const effectivePageWidth = isLandscape ? pageHeight : pageWidth;
+  const effectivePageHeight = isLandscape ? pageWidth : pageHeight;
 
+  const x = (effectivePageWidth - imgWidth) / 2;
+  const y = (effectivePageHeight - imgHeight) / 2;
+
+  const imgData = canvas.toDataURL("image/png", 1.0);
+  pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight, undefined, "FAST");
   pdf.save(filename);
 }
 
@@ -242,9 +298,7 @@ export function generateShareableURL(data: any, cardType: string): string {
     utm_medium: "link",
     utm_campaign: "user_share",
     card: cardType,
-    // Add data as base64 encoded JSON for shareability
     data: btoa(JSON.stringify(data)),
   });
-
   return `${baseURL}?${params.toString()}`;
 }

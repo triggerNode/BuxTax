@@ -71,3 +71,7 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Branded Supabase Auth emails
+
+Branded Supabase Auth email templates live under `supabase/templates/` and are wired via `supabase/config.toml` for local development. For hosted Supabase, upload each HTML template in Dashboard → Authentication → Email Templates. The templates reference the app icon at `/icon48.png`.

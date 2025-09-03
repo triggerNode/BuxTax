@@ -1,0 +1,91 @@
+---
+title: "Split Deals: How Revenue Shares Change Your Net"
+date: "2025-08-31"
+description: "70/30 or 50/50? See how splits, fees, and DevEx order-of-operations change your final USD take-home."
+tags: ["splits", "revshare", "profit"]
+slug: "revenue-splits-change-your-net"
+image: "/og/revenue-splits-change-your-net.png"
+imageAlt: "Revenue split math (70/30, 50/50) affecting take-home"
+canonical: "https://bux.tax/blog/revenue-splits-change-your-net"
+---
+
+Partner splits work, until the math gets fuzzy. Here’s a no‑nonsense way to calculate everyone’s take‑home **after** platform fees and **before** each person cashes out.
+
+## Order of operations (plain English)
+
+- **Platform fees first.** Roblox takes a platform cut at purchase time. For in‑experience sales like game passes and developer products, plan on about **30%**. Marketplace avatar items follow a different schedule; creators earn **at least 30%** with affiliate and platform shares on top.
+- **Then split Robux.** Most teams run revshare through **group payouts** or **recurring percentage splits** in Creator Hub. The split happens on **Robux**, not USD.
+- **Then each person DevEx individually.** Cash‑out works per account at the current DevEx rate (**$0.0035 per R$**), and only if the person meets eligibility.
+
+> Rule: Never split after DevEx. Split **post‑fee Robux** first, then each collaborator cashes out a personal share.
+
+## The quick model
+
+**Net USD (per collaborator)**  
+`= [ (Gross Robux − platform fees) × your split % − agreed shared costs ] × 0.0035`
+
+---
+
+## Scenarios (pure math)
+
+### A) 70/30 team split (no ad spend)
+
+Assume all revenue comes from in‑experience purchases with a 30% platform fee, then split via group payouts.
+
+|                         |                  Amount |
+| ----------------------- | ----------------------: |
+| **Gross Robux**         |              100,000 R$ |
+| **Platform cut (30%)**  |               30,000 R$ |
+| **Net to team**         |               70,000 R$ |
+| **Split 70% (Lead)**    | 49,000 R$ → **$171.50** |
+| **Split 30% (Partner)** |  21,000 R$ → **$73.50** |
+
+### B) 50/50 split + 10k R$ ad spend
+
+Ad spend sits in a central bucket and gets deducted **before** the split.
+
+|                            |                           Amount |
+| -------------------------- | -------------------------------: |
+| **Gross Robux**            |                        80,000 R$ |
+| **Platform cut (30%)**     |                        24,000 R$ |
+| **Net to team (post‑fee)** |                        56,000 R$ |
+| **Ad spend (centralized)** |                        10,000 R$ |
+| **Net to split**           |                        46,000 R$ |
+| **Split 50% / 50%**        | 23,000 R$ each → **$80.50** each |
+
+### C) Publisher‑style split (60/40) + minimum guarantee (MG) payback
+
+Assumptions: an MG of **50,000 R$** was paid earlier by the publisher and is **recouped from the creator’s share**.
+
+|                                       |                                                  Amount |
+| ------------------------------------- | ------------------------------------------------------: |
+| **Gross Robux**                       |                                              200,000 R$ |
+| **Platform cut (30%)**                |                                               60,000 R$ |
+| **Net to team**                       |                                              140,000 R$ |
+| **Split 60% Creator / 40% Publisher** |                                   84,000 R$ / 56,000 R$ |
+| **MG recoup (from Creator’s share)**  |                                              −50,000 R$ |
+| **Period cash to Creator**            |                                 **34,000 R$ → $119.00** |
+| **Period cash to Publisher**          | **56,000 R$ + 50,000 R$ recoup = 106,000 R$ → $371.00** |
+
+Totals reconcile: **34k + 106k = 140k R$**.
+
+---
+
+## Try it now
+
+- **Primary:** [DevEx Profit Calculator](/calculator?utm_source=blog&utm_medium=article&utm_campaign=cta)
+- **Secondary (prefilled example):** [Pre-fill with 100,000 Robux](/calculator?r=100000&utm_source=blog&utm_medium=article&utm_campaign=cta)
+
+_Use code **FOUNDERS50** for 50% off._
+
+---
+
+> "Estimates only / not affiliated with Roblox."
+
+### Sources (last 90 days)
+
+- Roblox **Developer Exchange Terms of Use** — “$0.0035 per Earned Robux,” eligibility (13+, 30k). [https://en.help.roblox.com/hc/en-us/articles/115005718246-Developer-Exchange-Terms-of-Use](https://en.help.roblox.com/hc/en-us/articles/115005718246-Developer-Exchange-Terms-of-Use)
+- **Earn on Roblox** — overview of earnings and Marketplace fee breakdowns. [https://create.roblox.com/docs/production/earn-on-roblox](https://create.roblox.com/docs/production/earn-on-roblox)
+- **Paid access in local currency** — 70% of proceeds (minus taxes/VAT). [https://create.roblox.com/docs/production/monetization/paid-access-local-currency](https://create.roblox.com/docs/production/monetization/paid-access-local-currency)
+- **Groups (teams)** — manage payouts and recurring percentage splits in Creator Hub. [https://create.roblox.com/docs/projects/groups](https://create.roblox.com/docs/projects/groups)
+- **Earned Robux & DevEx Rates** — treatment of group payouts as Earned Robux. [https://en.help.roblox.com/hc/en-us/articles/27984458742676-Earned-Robux-Earned-Robux-Wallet-and-DevEx-Rates](https://en.help.roblox.com/hc/en-us/articles/27984458742676-Earned-Robux-Earned-Robux-Wallet-and-DevEx-Rates)
