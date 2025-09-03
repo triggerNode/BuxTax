@@ -46,13 +46,11 @@ On top of that you can share visuals. Download clean PNG or PDF snapshots. Gener
 
 ## Screenshots
 
-![Profit Calculator]<img width="554" height="419" alt="Profit Calculator" src="https://github.com/user-attachments/assets/fe63d842-f08b-4e91-89ce-6141751ae772" />
+**Profit Calculator**     <img width="554" height="419" alt="Profit Calculator" src="https://github.com/user-attachments/assets/fe63d842-f08b-4e91-89ce-6141751ae772" />
 
+**Goals**                 <img width="549" height="333" alt="Goals" src="https://github.com/user-attachments/assets/110a2699-22c9-4b9a-89a8-fcdd02508ab6" />
 
-![Goals]<img width="549" height="333" alt="Goals" src="https://github.com/user-attachments/assets/110a2699-22c9-4b9a-89a8-fcdd02508ab6" />
-
-
-![Payout Pulse]<img width="732" height="454" alt="Payout Pulse" src="https://github.com/user-attachments/assets/94ccf078-d59f-4c7f-a836-77a0432e35a4" />
+**Payout Pulse**          <img width="732" height="454" alt="Payout Pulse" src="https://github.com/user-attachments/assets/94ccf078-d59f-4c7f-a836-77a0432e35a4" />
 
 
 ## Quick start
