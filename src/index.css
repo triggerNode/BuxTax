@@ -1,32 +1,28 @@
 /* Local Brand Fonts */
 @font-face {
   font-family: "Rounded Mplus 1c";
-  src: url("/brand/fonts/RoundedMplus1c-Regular.ttf")
-    format("truetype");
+  src: url("/brand/fonts/RoundedMplus1c-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Rounded Mplus 1c";
-  src: url("/brand/fonts/RoundedMplus1c-Medium.ttf")
-    format("truetype");
+  src: url("/brand/fonts/RoundedMplus1c-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Rounded Mplus 1c";
-  src: url("/brand/fonts/RoundedMplus1c-Bold.ttf")
-    format("truetype");
+  src: url("/brand/fonts/RoundedMplus1c-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Rounded Mplus 1c";
-  src: url("/brand/fonts/RoundedMplus1c-ExtraBold.ttf")
-    format("truetype");
+  src: url("/brand/fonts/RoundedMplus1c-ExtraBold.ttf") format("truetype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;

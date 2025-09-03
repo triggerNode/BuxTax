@@ -1,0 +1,41 @@
+[1mdiff --git a/src/index.css b/src/index.css[m
+[1mindex e3cd20a..7047b3c 100644[m
+[1m--- a/src/index.css[m
+[1m+++ b/src/index.css[m
+[36m@@ -1,32 +1,28 @@[m
+ /* Local Brand Fonts */[m
+ @font-face {[m
+   font-family: "Rounded Mplus 1c";[m
+[31m-  src: url("/brand/fonts/RoundedMplus1c-Regular.ttf")[m
+[31m-    format("truetype");[m
+[32m+[m[32m  src: url("/brand/fonts/RoundedMplus1c-Regular.ttf") format("truetype");[m
+   font-weight: 400;[m
+   font-style: normal;[m
+   font-display: swap;[m
+ }[m
+ @font-face {[m
+   font-family: "Rounded Mplus 1c";[m
+[31m-  src: url("/brand/fonts/RoundedMplus1c-Medium.ttf")[m
+[31m-    format("truetype");[m
+[32m+[m[32m  src: url("/brand/fonts/RoundedMplus1c-Medium.ttf") format("truetype");[m
+   font-weight: 500;[m
+   font-style: normal;[m
+   font-display: swap;[m
+ }[m
+ @font-face {[m
+   font-family: "Rounded Mplus 1c";[m
+[31m-  src: url("/brand/fonts/RoundedMplus1c-Bold.ttf")[m
+[31m-    format("truetype");[m
+[32m+[m[32m  src: url("/brand/fonts/RoundedMplus1c-Bold.ttf") format("truetype");[m
+   font-weight: 700;[m
+   font-style: normal;[m
+   font-display: swap;[m
+ }[m
+ @font-face {[m
+   font-family: "Rounded Mplus 1c";[m
+[31m-  src: url("/brand/fonts/RoundedMplus1c-ExtraBold.ttf")[m
+[31m-    format("truetype");[m
+[32m+[m[32m  src: url("/brand/fonts/RoundedMplus1c-ExtraBold.ttf") format("truetype");[m
+   font-weight: 800;[m
+   font-style: normal;[m
+   font-display: swap;[m

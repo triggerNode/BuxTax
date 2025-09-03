@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import buxtaxLogo from "@/assets/buxtax-logo.svg";
 interface BuxTaxHeaderProps {
   userType: "gameDev" | "ugcCreator";
   onUserTypeChange: (type: "gameDev" | "ugcCreator") => void;
@@ -33,11 +34,7 @@ export function BuxTaxHeader({
       <div className="mb-6">
         {/* Top row: BuxTax wordmark and primary actions */}
         <div className="relative flex items-center justify-center mb-2">
-          <img
-            src="/brand/buxtax-logo.svg"
-            alt="BuxTax Logo"
-            className="h-16 w-auto"
-          />
+          <img src={buxtaxLogo} alt="BuxTax Logo" className="h-16 w-auto" />
 
           <div className="absolute right-0 flex items-center gap-2 text-sm">
             <Dialog>

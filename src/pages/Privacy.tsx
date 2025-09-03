@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import buxtaxLogo from "@/assets/buxtax-logo.svg";
 
 export default function Privacy() {
   const navigate = useNavigate();
@@ -31,11 +32,7 @@ export default function Privacy() {
             Back to Calculator
           </Button>
           <div className="flex justify-center mb-6">
-            <img
-              src="/brand/buxtax-logo.svg"
-              alt="BuxTax Logo"
-              className="h-16 w-auto"
-            />
+            <img src={buxtaxLogo} alt="BuxTax Logo" className="h-16 w-auto" />
           </div>
         </div>
 

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import buxtaxLogo from "@/assets/buxtax-logo.svg";
 
 interface AuthFormData {
   email: string;
@@ -86,7 +87,7 @@ export default function SignIn() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
             <img
-              src="/brand/buxtax-logo.svg"
+              src={buxtaxLogo}
               alt="BuxTax Logo"
               className="h-16 w-auto mx-auto"
             />
