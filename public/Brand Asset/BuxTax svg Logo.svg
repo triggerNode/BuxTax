@@ -1,0 +1,10 @@
+<!-- Legacy path shim; redirect via HTML meta refresh as double safety -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0;url=/brand/buxtax-logo.svg">
+  </head>
+  <body>
+    <a href="/brand/buxtax-logo.svg">/brand/buxtax-logo.svg</a>
+  </body>
+</html>
