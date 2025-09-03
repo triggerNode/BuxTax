@@ -2,29 +2,51 @@
   "headers": [
     {
       "source": "/",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
     },
     {
       "source": "/index.html",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-store, max-age=0" }]
     },
     {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/brand/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/Brand%20Asset/BuxTax%20svg%20Logo.svg",
+      "destination": "/brand/buxtax-logo.svg",
+      "permanent": true
+    },
+    {
+      "source": "/Brand Asset/BuxTax svg Logo.svg",
+      "destination": "/brand/buxtax-logo.svg",
+      "permanent": true
+    },
+    {
+      "source": "/Brand%20Asset/favicon.svg",
+      "destination": "/brand/favicon.svg",
+      "permanent": true
+    },
+    {
+      "source": "/Brand%20Asset/favicon.ico",
+      "destination": "/brand/favicon.ico",
+      "permanent": true
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/brand/favicon.ico",
+      "permanent": true
     }
   ]
 }
-
-
