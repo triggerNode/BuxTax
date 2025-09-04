@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import buxtaxLogo from "@/assets/buxtax-logo.svg";
+const buxtaxLogoPath = "/brand/buxtax-logo.svg";
 
 export default function ThankYou() {
   const [params] = useSearchParams();
@@ -66,7 +66,7 @@ export default function ThankYou() {
         <div className="text-center mb-6">
           <Link to="/" className="inline-block">
             <img
-              src={buxtaxLogo}
+              src={buxtaxLogoPath}
               alt="BuxTax Logo"
               className="h-16 w-auto mx-auto"
             />

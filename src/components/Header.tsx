@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import buxtaxLogo from "@/assets/buxtax-logo.svg";
+const buxtaxLogoPath = "/brand/buxtax-logo.svg";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +21,11 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src={buxtaxLogo} alt="BuxTax Logo" className="h-8 w-auto" />
+            <img
+              src={buxtaxLogoPath}
+              alt="BuxTax Logo"
+              className="h-8 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
