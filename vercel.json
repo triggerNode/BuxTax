@@ -1,4 +1,10 @@
 {
+  "redirects": [
+    { "source": "/Brand%20Asset/BuxTax%20svg%20Logo.svg",  "destination": "/brand/buxtax-logo.svg", "permanent": true },
+    { "source": "/Brand%20Asset/BuxTax%2020x20%20Logo.svg","destination": "/brand/buxtax-logo.svg", "permanent": true },
+    { "source": "/Brand Asset/BuxTax svg Logo.svg",        "destination": "/brand/buxtax-logo.svg", "permanent": true },
+    { "source": "/Brand Asset/BuxTax 20x20 Logo.svg",       "destination": "/brand/buxtax-logo.svg", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/",
