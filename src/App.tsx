@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
+import GtagRouteListener from "@/components/GtagRouteListener";
 
 // Current pages (preserved)
 import Terms from "./pages/Terms";
@@ -36,6 +37,7 @@ const AppRouter = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <GtagRouteListener />
             <Routes>
               {/* Redirect legacy /pricing route to landing section without flashing 404 */}
               <Route
