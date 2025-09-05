@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && ts-node scripts/generate-seo.ts",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "export:dev": "ts-node server/exporter.ts"
+    "export:dev": "ts-node server/exporter.ts",
+    "seo": "ts-node scripts/generate-seo.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",

@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://bux.tax/</loc>
-  </url>
-  <url>
-    <loc>https://bux.tax/blog</loc>
-  </url>
-  <url>
-    <loc>https://bux.tax/blog/what-is-buxtax</loc>
-  </url>
-  <url>
-    <loc>https://bux.tax/blog/payout-pulse-explained</loc>
-  </url>
-  <url>
-    <loc>https://bux.tax/terms</loc>
-  </url>
-  <url>
-    <loc>https://bux.tax/privacy</loc>
-  </url>
+  <url><loc>https://bux.tax/</loc></url>
+  <url><loc>https://bux.tax/blog</loc></url>
+  <url><loc>https://bux.tax/calculator</loc></url>
+  <url><loc>https://bux.tax/terms</loc></url>
+  <url><loc>https://bux.tax/privacy</loc></url>
+
+  <!-- Blog posts -->
+  <url><loc>https://bux.tax/blog/case-study-1m-robux-to-real-cash</loc></url>
+  <url><loc>https://bux.tax/blog/devex-eligibility-common-pitfalls</loc></url>
+  <url><loc>https://bux.tax/blog/devex-fees-explained-examples</loc></url>
+  <url><loc>https://bux.tax/blog/revenue-splits-change-your-net</loc></url>
+  <url><loc>https://bux.tax/blog/roblox-ads-vs-sponsoring-roi</loc></url>
+  <url><loc>https://bux.tax/blog/roblox-payout-calculator-csv</loc></url>
+  <url><loc>https://bux.tax/blog/robux-needed-for-usd-goal</loc></url>
+  <url><loc>https://bux.tax/blog/robux-to-usd-quick-reference-table</loc></url>
+  <url><loc>https://bux.tax/blog/robux-to-usd-rates</loc></url>
+  <url><loc>https://bux.tax/blog/seasonality-in-roblox-payouts</loc></url>
+  <url><loc>https://bux.tax/blog/ten-biggest-profit-leaks-roblox-creators</loc></url>
+  <url><loc>https://bux.tax/blog/ugc-pricing-profit-math</loc></url>
 </urlset>
 
 

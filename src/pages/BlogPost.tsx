@@ -11,7 +11,9 @@ export default function BlogPost() {
 
   const { title, date, Component, image, imageAlt, readingTimeMinutes, tags } =
     post;
-  const canonical = (post as any).canonical as string | undefined;
+  const canonical =
+    ((post as any).canonical as string | undefined) ||
+    new URL(`/blog/${post.slug}`, window.location.origin).toString();
   const absoluteOgImage = image
     ? new URL(image, window.location.origin).toString()
     : undefined;
@@ -23,7 +25,7 @@ export default function BlogPost() {
         {post.description && (
           <meta name="description" content={post.description} />
         )}
-        {canonical && <link rel="canonical" href={canonical} />}
+        <link rel="canonical" href={canonical} />
 
         {/* Open Graph / Twitter */}
         <meta property="og:title" content={title} />
@@ -31,7 +33,7 @@ export default function BlogPost() {
           <meta property="og:description" content={post.description} />
         )}
         <meta property="og:type" content="article" />
-        {canonical && <meta property="og:url" content={canonical} />}
+        <meta property="og:url" content={canonical} />
         {absoluteOgImage && (
           <meta property="og:image" content={absoluteOgImage} />
         )}
