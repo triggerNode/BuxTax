@@ -64,7 +64,7 @@ export function Hero() {
             <div className="flex items-center space-x-6 text-sm text-muted-foreground">
               <span>✓ Instant calculations</span>
               <span>✓ No recurring fees</span>
-              <span>✓ Lifetime pricing available for 30 days</span>
+              <span>✓ Lifetime pricing available for a limited time</span>
             </div>
           </motion.div>
 

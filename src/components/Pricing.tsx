@@ -105,7 +105,7 @@ export function Pricing() {
                 </Button>
 
                 <div className="text-xs text-center text-muted-foreground">
-                  One-time payment · lifetime access (30-day window)
+                  One-time payment · lifetime access (limited time offer)
                 </div>
               </CardContent>
             </Card>
@@ -170,7 +170,7 @@ export function Pricing() {
                 </Button>
 
                 <div className="text-xs text-center text-muted-foreground">
-                  One-time payment · lifetime access (30-day window)
+                  One-time payment · lifetime access (limited time offer)
                 </div>
               </CardContent>
             </Card>
@@ -190,8 +190,8 @@ export function Pricing() {
               ⏳ Limited-Time Lifetime Pricing
             </h3>
             <p className="text-sm text-foreground">
-              Pay once, own it for life. Our one-time price is available for the
-              next 30 days; after that, new customers move to a subscription.
+              Pay once, own it for life. Our one-time price is available for a
+              limited time; after that, new customers move to a subscription.
               Purchases made now keep lifetime access.
             </p>
           </div>

@@ -127,11 +127,11 @@ const ProfitCalculator = memo(function ProfitCalculator({
               USD Payout
             </div>
             <FormulaTooltip
-              formula="Net Robux ÷ 350"
+              formula="Net Robux × 0.0037975"
               description="USD payout calculation"
               variables={{
                 "Net Robux": "Gross Robux - All Costs - Marketplace Fee",
-                "350": "Current DevEx rate (Robux per USD)",
+                "0.0037975": "Current DevEx rate (USD per Robux)",
               }}
             />
           </div>
@@ -340,7 +340,7 @@ const ProfitCalculator = memo(function ProfitCalculator({
         >
           {/* Derive a USD-per-R$ from what we already show in the top cards. */}
           {(() => {
-            const DEFAULT_USD_PER_ROBUX = 0.0035;
+            const DEFAULT_USD_PER_ROBUX = 0.0037975;
             const usdPerRobux =
               results?.netRobux > 0 && typeof results?.usdPayout === "number"
                 ? results.usdPayout / results.netRobux

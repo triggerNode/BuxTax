@@ -120,7 +120,7 @@ export function Paywall({ children }: PaywallProps) {
 
               <div className="text-xs text-muted-foreground">
                 ✓ Instant access • ✓ No recurring fees • ✓ Lifetime pricing
-                available for 30 days
+                available for a limited time
               </div>
             </div>
           </CardContent>

@@ -202,9 +202,9 @@ export function Pricing() {
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   Yes. Our one-time “buy once” lifetime access is available for
-                  30 days. After that, new customers will be on a subscription
-                  plan. Purchases made during this window keep lifetime access
-                  permanently.
+                  a limited time. After that, new customers will be on a
+                  subscription plan. Purchases made during this window keep
+                  lifetime access permanently.
                 </p>
               </div>
               <div>

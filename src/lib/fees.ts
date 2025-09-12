@@ -1,17 +1,17 @@
 // Centralized fee calculations and constants
 export const FEE_CONSTANTS = {
-  // DevEx conversion rate: $3.50 per 1000 Robux
-  DEVEX_RATE_USD_PER_ROBUX: 3.50 / 1000,
-  
+  // DevEx conversion rate: $3.7975 per 1000 Robux (reflects 8.5% increase)
+  DEVEX_RATE_USD_PER_ROBUX: 0.0037975,
+
   // Platform fees by user type
   MARKETPLACE_FEE: {
-    GAME_DEV: 0.30,      // 30% for game developers
-    UGC_CREATOR: 0.70,   // 70% for UGC creators
+    GAME_DEV: 0.3, // 30% for game developers
+    UGC_CREATOR: 0.7, // 70% for UGC creators
   },
-  
+
   // Last updated timestamp
-  LAST_UPDATED: '2025-01-28',
-  SOURCE_URL: 'https://en.help.roblox.com/hc/en-us/articles/13061189551124',
+  LAST_UPDATED: "2025-01-28",
+  SOURCE_URL: "https://en.help.roblox.com/hc/en-us/articles/13061189551124",
 } as const;
 
 export interface CostBreakdown {
@@ -35,8 +35,8 @@ export interface CalculationResult {
 
 export function calculateProfit(
   grossRobux: number,
-  userType: 'gameDev' | 'ugcCreator',
-  costs: Partial<Omit<CostBreakdown, 'grossRobux' | 'marketplaceFee'>> = {}
+  userType: "gameDev" | "ugcCreator",
+  costs: Partial<Omit<CostBreakdown, "grossRobux" | "marketplaceFee">> = {}
 ): CalculationResult {
   const {
     adSpend = 0,
@@ -47,20 +47,30 @@ export function calculateProfit(
   } = costs;
 
   // Calculate marketplace fee
-  const feeRate = FEE_CONSTANTS.MARKETPLACE_FEE[userType === 'gameDev' ? 'GAME_DEV' : 'UGC_CREATOR'];
+  const feeRate =
+    FEE_CONSTANTS.MARKETPLACE_FEE[
+      userType === "gameDev" ? "GAME_DEV" : "UGC_CREATOR"
+    ];
   const marketplaceFee = grossRobux * feeRate;
 
   // Calculate total costs
-  const totalCosts = marketplaceFee + adSpend + groupSplits + affiliatePayouts + refunds + otherCosts;
-  
+  const totalCosts =
+    marketplaceFee +
+    adSpend +
+    groupSplits +
+    affiliatePayouts +
+    refunds +
+    otherCosts;
+
   // Calculate net Robux
   const netRobux = Math.max(0, grossRobux - totalCosts);
-  
+
   // Convert to USD
   const usdPayout = netRobux * FEE_CONSTANTS.DEVEX_RATE_USD_PER_ROBUX;
-  
+
   // Calculate effective take rate
-  const effectiveTakeRate = grossRobux > 0 ? (totalCosts / grossRobux) * 100 : 0;
+  const effectiveTakeRate =
+    grossRobux > 0 ? (totalCosts / grossRobux) * 100 : 0;
 
   const breakdown: CostBreakdown = {
     grossRobux,
@@ -84,15 +94,20 @@ export function calculateProfit(
 
 export function calculateRequiredRobux(
   targetUSD: number,
-  userType: 'gameDev' | 'ugcCreator',
-  expectedCosts: Partial<Omit<CostBreakdown, 'grossRobux' | 'marketplaceFee'>> = {}
+  userType: "gameDev" | "ugcCreator",
+  expectedCosts: Partial<
+    Omit<CostBreakdown, "grossRobux" | "marketplaceFee">
+  > = {}
 ): number {
   // Convert target USD to required net Robux
   const requiredNetRobux = targetUSD / FEE_CONSTANTS.DEVEX_RATE_USD_PER_ROBUX;
-  
+
   // Get platform fee rate
-  const feeRate = FEE_CONSTANTS.MARKETPLACE_FEE[userType === 'gameDev' ? 'GAME_DEV' : 'UGC_CREATOR'];
-  
+  const feeRate =
+    FEE_CONSTANTS.MARKETPLACE_FEE[
+      userType === "gameDev" ? "GAME_DEV" : "UGC_CREATOR"
+    ];
+
   // Calculate expected non-platform costs
   const {
     adSpend = 0,
@@ -101,25 +116,26 @@ export function calculateRequiredRobux(
     refunds = 0,
     otherCosts = 0,
   } = expectedCosts;
-  
-  const fixedCosts = adSpend + groupSplits + affiliatePayouts + refunds + otherCosts;
-  
+
+  const fixedCosts =
+    adSpend + groupSplits + affiliatePayouts + refunds + otherCosts;
+
   // Solve for gross Robux: netRobux = grossRobux * (1 - feeRate) - fixedCosts
   // grossRobux = (netRobux + fixedCosts) / (1 - feeRate)
   const requiredGrossRobux = (requiredNetRobux + fixedCosts) / (1 - feeRate);
-  
+
   return Math.ceil(requiredGrossRobux); // Round up to ensure target is met
 }
 
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(amount);
 }
 
 export function formatRobux(amount: number): string {
-  return new Intl.NumberFormat('en-US').format(Math.round(amount)) + ' R$';
+  return new Intl.NumberFormat("en-US").format(Math.round(amount)) + " R$";
 }
 
 export function formatPercentage(value: number): string {

@@ -244,37 +244,37 @@ const PayoutPulse = memo(function PayoutPulse({
       {
         category: "Marketplace Fee",
         totalRobux: totals.marketplaceFee,
-        totalUSD: totals.marketplaceFee * 0.0035,
+        totalUSD: totals.marketplaceFee * 0.0037975,
         percentage: (totals.marketplaceFee / totals.grossRobux) * 100,
       },
       {
         category: "Ad Spend",
         totalRobux: totals.adSpend,
-        totalUSD: totals.adSpend * 0.0035,
+        totalUSD: totals.adSpend * 0.0037975,
         percentage: (totals.adSpend / totals.grossRobux) * 100,
       },
       {
         category: "Group Splits",
         totalRobux: totals.groupSplits,
-        totalUSD: totals.groupSplits * 0.0035,
+        totalUSD: totals.groupSplits * 0.0037975,
         percentage: (totals.groupSplits / totals.grossRobux) * 100,
       },
       {
         category: "Affiliate Payouts",
         totalRobux: totals.affiliatePayouts,
-        totalUSD: totals.affiliatePayouts * 0.0035,
+        totalUSD: totals.affiliatePayouts * 0.0037975,
         percentage: (totals.affiliatePayouts / totals.grossRobux) * 100,
       },
       {
         category: "Refunds",
         totalRobux: totals.refunds,
-        totalUSD: totals.refunds * 0.0035,
+        totalUSD: totals.refunds * 0.0037975,
         percentage: (totals.refunds / totals.grossRobux) * 100,
       },
       {
         category: "Other Costs",
         totalRobux: totals.otherCosts,
-        totalUSD: totals.otherCosts * 0.0035,
+        totalUSD: totals.otherCosts * 0.0037975,
         percentage: (totals.otherCosts / totals.grossRobux) * 100,
       },
     ].filter((item) => item.totalRobux > 0);
@@ -307,7 +307,7 @@ const PayoutPulse = memo(function PayoutPulse({
       [viewMode === "robux" ? "netRobux" : "netUSD"]:
         viewMode === "robux" ? item.netRobux : item.usdValue,
       [viewMode === "robux" ? "grossRobux" : "grossUSD"]:
-        viewMode === "robux" ? item.grossRobux : item.grossRobux * 0.0035,
+        viewMode === "robux" ? item.grossRobux : item.grossRobux * 0.0037975,
     }));
   };
 
