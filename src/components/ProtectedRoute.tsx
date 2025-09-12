@@ -1,3 +1,5 @@
+// src/components/ProtectedRoute.tsx
+
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,24 +10,23 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
-  const { profile } = useProfile();
+  const { user, loading: authLoading } = useAuth(); // Renamed loading to authLoading
+  const { profile, loading: profileLoading } = useProfile(); // Renamed loading to profileLoading
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (!loading && !user) {
-      // Store the intended destination
+    // This part is for redirecting users who are NOT logged in.
+    // We only run this check once the initial auth check is done.
+    if (!authLoading && !user) {
       navigate("/signin", {
         state: { from: location.pathname + location.search },
       });
     }
-  }, [user, loading, navigate, location]);
+  }, [user, authLoading, navigate, location]);
 
-  // Check if user has active payment status
-  const hasActivePayment = user && profile?.payment_status === "active";
-
-  if (loading) {
+  // THE KEY FIX: Wait until BOTH authentication and profile loading are finished.
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -33,15 +34,18 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  // If there's no user at this point, the useEffect above will handle the redirect.
+  // Returning null prevents a flicker of the protected content.
   if (!user) {
     return null;
   }
 
-  // If the user is authenticated but lacks an active payment,
-  // allow them to visit /account, otherwise push them to landing pricing section
-  if (user && !hasActivePayment) {
-    const allowed = ["/account"];
-    if (!allowed.includes(location.pathname)) {
+  // Now, with all data loaded, we can safely check the payment status.
+  const hasActivePayment = profile?.payment_status === "active";
+
+  if (!hasActivePayment) {
+    // Allow access to the account page regardless of payment status.
+    if (location.pathname !== "/account") {
       navigate("/#pricing");
       return null;
     }
