@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger
 import { useToast } from "@/hooks/use-toast";
 const buxtaxLogoPath = "/brand/buxtax-logo.svg";
 
@@ -25,7 +24,6 @@ interface AuthFormData {
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
-  const { profile } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -41,19 +39,10 @@ export default function SignIn() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (user && profile) {
-      // Check if user has active payment status
-      const hasActivePayment = profile?.payment_status === "active";
-
-      if (hasActivePayment) {
-        // User has active payment, redirect to their intended destination
-        navigate(from, { replace: true });
-      } else {
-        // User doesn't have active payment, redirect to account page where they can manage payment
-        navigate("/account", { replace: true });
-      }
+    if (user) {
+      navigate(from, { replace: true });
     }
-  }, [user, profile, navigate, from]);
+  }, [user, navigate, from]);
 
   const onSignIn = async (data: AuthFormData) => {
     setIsLoading(true);
@@ -66,8 +55,7 @@ export default function SignIn() {
         description: error.message,
       });
     } else {
-      // The useEffect will handle the redirect based on payment status
-      // No need to navigate here as the auth state change will trigger the redirect
+      navigate(from, { replace: true });
     }
     setIsLoading(false);
   };
