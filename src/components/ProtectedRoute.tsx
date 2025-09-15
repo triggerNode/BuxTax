@@ -1,47 +1,51 @@
-// src/components/ProtectedRoute.tsx
-import { Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { LoadingSpinner } from "./LoadingSpinner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading: authLoading } = useAuth();
-  const { profile, loading: profileLoading } = useProfile();
+  const { user, loading } = useAuth();
+  const { profile } = useProfile();
+  const navigate = useNavigate();
   const location = useLocation();
 
-  // 1. Show a spinner while we wait for user and profile data to load.
-  if (authLoading || profileLoading) {
-    // The user's status is still being determined.
-    return <LoadingSpinner />;
+  useEffect(() => {
+    if (!loading && !user) {
+      // Store the intended destination
+      navigate("/signin", {
+        state: { from: location.pathname + location.search },
+      });
+    }
+  }, [user, loading, navigate, location]);
+
+  // Check if user has active payment status
+  const hasActivePayment = user && profile?.payment_status === "active";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
-  // 2. After loading, if there is still no user, they are not logged in.
-  // Redirect them to the sign-in page.
   if (!user) {
-    return <Navigate to="/signin" state={{ from: location }} replace />;
+    return null;
   }
 
-  // 3. A user exists. Now we can check their payment status.
-  const hasActivePayment = profile?.payment_status === "active";
-
-  if (hasActivePayment) {
-    // GREEN LANE: The user is logged in and has an active payment.
-    // Grant them access to the page they requested.
-    return <>{children}</>;
-  } else {
-    // RED LANE: The user is logged in but is NOT paid.
-    // We create the "payment jail".
-    
-    // Are they already on the account page? If so, let them stay.
-    if (location.pathname === "/account") {
-      return <>{children}</>;
-    } else {
-      // If they try to go anywhere else, force them to the /account page.
-      return <Navigate to="/account" replace />;
+  // If the user is authenticated but lacks an active payment,
+  // allow them to visit /account, otherwise push them to landing pricing section
+  if (user && !hasActivePayment) {
+    const allowed = ["/account"];
+    if (!allowed.includes(location.pathname)) {
+      navigate("/#pricing");
+      return null;
     }
   }
+
+  return <>{children}</>;
 }
