@@ -52,7 +52,12 @@ export function Paywall({ children }: PaywallProps) {
   const [loading, setLoading] = useState(false);
 
   // Show content if user is authenticated and has active payment status
-  const hasAccess = !!user && profile?.payment_status === "active";
+  // Also grant access if plan is lifetime or studio (paid plans), even if payment_status hasn't synced yet
+  const hasAccess =
+    !!user &&
+    (profile?.payment_status === "active" ||
+      profile?.plan === "lifetime" ||
+      profile?.plan === "studio");
 
   if (hasAccess) {
     return <>{children}</>;

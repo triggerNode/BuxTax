@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +25,7 @@ interface AuthFormData {
 export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -37,12 +39,14 @@ export default function SignIn() {
     reset,
   } = useForm<AuthFormData>();
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated AND profile has loaded
   useEffect(() => {
-    if (user) {
+    if (user && !profileLoading) {
+      console.log("🚀 SignIn redirect - User:", user.email, "Profile:", profile);
+      setIsLoading(false); // Reset loading state before redirect
       navigate(from, { replace: true });
     }
-  }, [user, navigate, from]);
+  }, [user, profile, profileLoading, navigate, from]);
 
   const onSignIn = async (data: AuthFormData) => {
     setIsLoading(true);
@@ -54,10 +58,12 @@ export default function SignIn() {
         title: "Sign in failed",
         description: error.message,
       });
+      setIsLoading(false);
     } else {
-      navigate(from, { replace: true });
+      console.log("✅ SignIn successful, waiting for profile to load...");
+      // Don't navigate immediately - let useEffect handle it after profile loads
+      // setIsLoading will be set to false by useEffect when redirect happens
     }
-    setIsLoading(false);
   };
 
   const onSignUp = async (data: AuthFormData) => {

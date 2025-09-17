@@ -8,24 +8,25 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
-  const { profile } = useProfile();
+  const { user, loading: authLoading } = useAuth();
+  const { loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Resolve both hooks before deciding
+  const isReady = !authLoading && !profileLoading;
+
+  // Handle navigation only for unauthenticated users
   useEffect(() => {
-    if (!loading && !user) {
-      // Store the intended destination
+    if (isReady && !user) {
       navigate("/signin", {
         state: { from: location.pathname + location.search },
       });
     }
-  }, [user, loading, navigate, location]);
+  }, [isReady, user, navigate, location]);
 
-  // Check if user has active payment status
-  const hasActivePayment = user && profile?.payment_status === "active";
-
-  if (loading) {
+  // Show loading while either auth or profile is loading
+  if (!isReady) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -35,16 +36,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!user) {
     return null;
-  }
-
-  // If the user is authenticated but lacks an active payment,
-  // allow them to visit /account, otherwise push them to landing pricing section
-  if (user && !hasActivePayment) {
-    const allowed = ["/account"];
-    if (!allowed.includes(location.pathname)) {
-      navigate("/#pricing");
-      return null;
-    }
   }
 
   return <>{children}</>;

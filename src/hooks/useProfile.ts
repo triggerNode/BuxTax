@@ -16,6 +16,7 @@ export function useProfile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const isDev = import.meta.env.DEV;
 
   useEffect(() => {
     if (!user) {
@@ -26,6 +27,7 @@ export function useProfile() {
 
     // Fetch profile data
     const fetchProfile = async () => {
+      if (isDev) console.log("🔍 Fetching profile for user:", user.id);
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -33,8 +35,9 @@ export function useProfile() {
         .maybeSingle();
 
       if (error) {
-        console.error("Error fetching profile:", error);
+        if (isDev) console.error("❌ Error fetching profile:", error);
       } else {
+        if (isDev) console.log("✅ Profile loaded:", data);
         setProfile(data);
       }
       setLoading(false);
